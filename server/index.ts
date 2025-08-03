@@ -6,6 +6,7 @@ import { serveStatic, log } from "./vite";
 import { securityHeaders, sanitizeInput } from "./middleware/security";
 import { databaseQueryProtection } from "./middleware/securityEnforcement";
 import cors from 'cors';
+import path from 'path';
 
 // Токен Telegram бота загружается из переменных окружения
 import dotenv from 'dotenv';
@@ -23,6 +24,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+app.get('/manifest.json', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.sendFile(path.join(process.cwd(), 'public', 'manifest.json'));
+});
 app.use(sanitizeInput);
 app.use(databaseQueryProtection);
 
