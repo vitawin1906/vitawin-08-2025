@@ -5,6 +5,7 @@ import { registerRoutes } from "./routes";
 import { serveStatic, log } from "./vite";
 import { securityHeaders, sanitizeInput } from "./middleware/security";
 import { databaseQueryProtection } from "./middleware/securityEnforcement";
+import cors from 'cors';
 
 // Токен Telegram бота загружается из переменных окружения
 import dotenv from 'dotenv';
@@ -15,6 +16,13 @@ const app = express();
 // Security hardening - comprehensive protection
 // app.use(productionSecurityEnforcement);
 // app.use(securityHeaders);
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(sanitizeInput);
 app.use(databaseQueryProtection);
 
