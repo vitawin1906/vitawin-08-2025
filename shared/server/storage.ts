@@ -61,25 +61,21 @@ import {
   type InsertUserMlmStatus,
 } from "@shared/schema";
 
-// Конфигурация подключения к PostgreSQL
-// Replit предоставляет DATABASE_URL, в Docker используется fallback  
-// Docker production configuration
-const connectionString = process.env.DATABASE_URL || 
-  (process.env.NODE_ENV === 'production' 
-    ? 'postgresql://vitawin_user:vitawin_secure_password_2025@postgres:5432/vitawin'
-    : 'postgresql://vitawin_user:strong_password_123@localhost:5432/vitawin');
-
-console.log("PostgreSQL connection initialized");
-console.log("Environment:", process.env.NODE_ENV || 'development');
-console.log("Database type:", connectionString.includes('localhost') ? 'Local/Docker' : 'Replit managed');
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
   throw new Error("DATABASE_URL environment variable is required");
 }
 
+console.log("PostgreSQL connection initialized");
+console.log("Environment:", process.env.NODE_ENV || 'development');
+console.log("Database type: Neon (remote)");
+
+
+
 const pool = new Pool({
   connectionString,
-  ssl: false  // SSL отключен для всех окружений (Replit, Docker, localhost)
+  ssl: { rejectUnauthorized: false }
 });
 
 export const db = drizzle(pool);

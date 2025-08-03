@@ -157,4 +157,4 @@ fi
 echo ""
 echo "📝 Команды для тестирования Docker:"
 echo "   docker build -t vitawin ."
-echo "   docker run -p 5000:5000 -e DATABASE_URL=your_db_url vitawin"
+echo "   docker run -p 5050:5050 -e DATABASE_URL=your_db_url vitawin"

@@ -28,7 +28,7 @@ sudo bash deploy-vitawin-vds.sh
 После выполнения скрипта на VDS:
 - **Товары**: 8 вместо 0 ❌ ➡️ ✅
 - **Сайт работает**: http://ваш-ip
-- **API работает**: http://ваш-ip:5000
+- **API работает**: http://ваш-ip:5050
 
 ## 🔧 Архитектура
 
@@ -49,7 +49,7 @@ sudo bash deploy-vitawin-vds.sh
 docker exec vitawin_postgres psql -U vitawin_user -d vitawin -c "SELECT COUNT(*) FROM products;"
 
 # Проверить API
-curl http://localhost:5000/api/products
+curl http://localhost:5050/api/products
 ```
 
 Результат: **8 товаров** вместо 0!

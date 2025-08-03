@@ -72,17 +72,18 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://vitawin_user:strong_password_123@postgres:5432/vitawin
-      PORT: 5000
+      DATABASE_URL: postgresql://neondb_owner:пароль@ep-хост.neon.tech/neondb?sslmode=require
+
+      PORT: 5050
     ports:
-      - "5000:5000"
+      - "5050:5050"
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - vitawin_network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5050/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -117,7 +118,7 @@ events {
 
 http {
     upstream app {
-        server app:5000;
+        server app:5050;
     }
 
     server {
@@ -177,7 +178,7 @@ echo "🧪 Проверка работоспособности..."
 sleep 10
 
 # Проверка API
-if curl -f http://localhost:5000/health > /dev/null 2>&1; then
+if curl -f http://localhost:5050/health > /dev/null 2>&1; then
     echo "✅ API работает!"
 else
     echo "⚠️ API пока не отвечает, проверьте логи: docker compose logs app"
@@ -191,7 +192,7 @@ echo ""
 echo "🎉 УСТАНОВКА ЗАВЕРШЕНА!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🌐 Сайт доступен: http://$(curl -s ifconfig.me)"
-echo "🔧 API: http://$(curl -s ifconfig.me):5000"
+echo "🔧 API: http://$(curl -s ifconfig.me):5050"
 echo "📊 Админка: http://$(curl -s ifconfig.me)/admin"
 echo ""
 echo "📋 Полезные команды:"

@@ -33,11 +33,11 @@ node scripts/migration/sync-data-to-production.mjs
 
 # Проверка API
 echo "🧪 Тестирование API..."
-curl -f http://localhost:5000/health || {
+curl -f http://localhost:5050/health || {
     echo "❌ API не отвечает"
     exit 1
 }
 
 echo "✅ Развертывание завершено успешно!"
 echo "🌐 Приложение доступно на: http://localhost"
-echo "📱 API доступно на: http://localhost:5000"
+echo "📱 API доступно на: http://localhost:5050"

@@ -20,7 +20,7 @@ sudo bash deploy-vitawin-vds.sh
 ## После установки:
 
 - **Сайт**: `http://ваш-ip`
-- **API**: `http://ваш-ip:5000` 
+- **API**: `http://ваш-ip:5050` 
 - **Админка**: `http://ваш-ip/admin`
 
 ## Доступы:

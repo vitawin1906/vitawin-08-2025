@@ -129,7 +129,7 @@ class MemoryManager {
     // Дополнительная очистка через 5 секунд
     setTimeout(() => {
       this.forceGarbageCollection();
-    }, 5000);
+    }, 5050);
   }
 
   /**

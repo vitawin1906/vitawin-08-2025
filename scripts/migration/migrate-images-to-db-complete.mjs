@@ -60,7 +60,7 @@ async function completeImageMigration() {
         if (product.images && product.images.length > 0) {
           for (const imagePath of product.images) {
             try {
-              const fullImageUrl = `http://localhost:5000${imagePath}`;
+              const fullImageUrl = `http://localhost:5050${imagePath}`;
               const imageResponse = await fetch(fullImageUrl, { method: 'HEAD' });
               
               if (imageResponse.status === 200) {
@@ -96,7 +96,7 @@ async function completeImageMigration() {
     console.log('\n=== ПРОВЕРКА ИНТЕГРАЦИИ АДМИНКИ ===');
     
     try {
-      const siteScriptsResponse = await fetch('http://localhost:5000/api/site-scripts');
+      const siteScriptsResponse = await fetch('http://localhost:5050/api/site-scripts');
       const scriptsData = await siteScriptsResponse.json();
       
       console.log('Статус API скриптов:', siteScriptsResponse.status);

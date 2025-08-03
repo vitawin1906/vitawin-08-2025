@@ -5,7 +5,7 @@ async function testOrder18Bonuses() {
     console.log('Тестируем автоматические уведомления для заказа 18...');
     
     // Прямой вызов функции расчета бонусов
-    const response = await fetch('http://localhost:5000/api/ai-agent/calculate-bonuses', {
+    const response = await fetch('http://localhost:5050/api/ai-agent/calculate-bonuses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

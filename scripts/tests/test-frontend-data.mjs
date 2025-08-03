@@ -5,7 +5,7 @@ async function testFrontendData() {
     console.log('Проверка данных для фронтенда...\n');
 
     // Получаем список товаров
-    const productsResponse = await fetch('http://localhost:5000/api/products');
+    const productsResponse = await fetch('http://localhost:5050/api/products');
     const productsData = await productsResponse.json();
     
     console.log('=== СПИСОК ТОВАРОВ ===');
@@ -45,7 +45,7 @@ async function testFrontendData() {
       
       console.log(`\n=== ДЕТАЛЬНАЯ ИНФОРМАЦИЯ О ТОВАРЕ ID=${productId} ===`);
       
-      const detailResponse = await fetch(`http://localhost:5000/api/product/${productId}`);
+      const detailResponse = await fetch(`http://localhost:5050/api/product/${productId}`);
       const detailData = await detailResponse.json();
       
       console.log('Статус:', detailResponse.status);
@@ -100,7 +100,7 @@ async function testFrontendData() {
           totalImages++;
           
           try {
-            const fullImageUrl = imageUrl.startsWith('http') ? imageUrl : `http://localhost:5000${imageUrl}`;
+            const fullImageUrl = imageUrl.startsWith('http') ? imageUrl : `http://localhost:5050${imageUrl}`;
             const imageResponse = await fetch(fullImageUrl, { method: 'HEAD' });
             
             if (imageResponse.status === 200) {

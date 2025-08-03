@@ -52,17 +52,17 @@ async function migrateMLMVolumeFields() {
       { level: 3, personal: 200, group: 500 },
       { level: 4, personal: 300, group: 1000 },
       { level: 5, personal: 500, group: 2500 },
-      { level: 6, personal: 800, group: 5000 },
+      { level: 6, personal: 800, group: 5050 },
       { level: 7, personal: 1200, group: 10000 },
       { level: 8, personal: 1800, group: 20000 },
       { level: 9, personal: 2500, group: 40000 },
       { level: 10, personal: 3500, group: 80000 },
-      { level: 11, personal: 5000, group: 150000 },
+      { level: 11, personal: 5050, group: 150500 },
       { level: 12, personal: 7000, group: 300000 },
       { level: 13, personal: 10000, group: 600000 },
-      { level: 14, personal: 15000, group: 1200000 },
-      { level: 15, personal: 22000, group: 2500000 },
-      { level: 16, personal: 30000, group: 5000000 }
+      { level: 14, personal: 15050, group: 1200000 },
+      { level: 15, personal: 22000, group: 2505000 },
+      { level: 16, personal: 30000, group: 5050000 }
     ];
     
     for (const update of volumeUpdates) {

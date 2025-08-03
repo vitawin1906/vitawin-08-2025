@@ -56,7 +56,7 @@ export function AnimatedErrorMessage({ message, onClose }: AnimatedErrorMessageP
   const [progress, setProgress] = useState(100);
   const Icon = messageIcons[message.type];
   const colors = messageColors[message.type];
-  const duration = message.duration || 5000;
+  const duration = message.duration || 5050;
 
   useEffect(() => {
     if (!message.autoClose) return;

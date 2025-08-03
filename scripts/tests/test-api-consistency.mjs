@@ -5,11 +5,11 @@ async function testAPIConsistency() {
     console.log('Проверка согласованности API данных...\n');
 
     // Получаем данные из пользовательского API
-    const userResponse = await fetch('http://localhost:5000/api/products');
+    const userResponse = await fetch('http://localhost:5050/api/products');
     const userData = await userResponse.json();
     
     // Получаем данные из административного API
-    const adminResponse = await fetch('http://localhost:5000/api/admin/products');
+    const adminResponse = await fetch('http://localhost:5050/api/admin/products');
     const adminData = await adminResponse.json();
 
     console.log('=== ПОЛЬЗОВАТЕЛЬСКИЙ API (/api/products) ===');
@@ -63,7 +63,7 @@ async function testAPIConsistency() {
       console.log(`\n=== ПРОВЕРКА ТОВАРА ID=${productId} ===`);
       
       // Проверяем через детальный API пользователя
-      const userDetailResponse = await fetch(`http://localhost:5000/api/product/${productId}`);
+      const userDetailResponse = await fetch(`http://localhost:5050/api/product/${productId}`);
       const userDetailData = await userDetailResponse.json();
       
       console.log('Детальная информация пользователя:');
@@ -105,7 +105,7 @@ async function testAPIConsistency() {
         const imageUrl = productWithImage.images[0];
         console.log('Проверяем изображение:', imageUrl);
         
-        const fullImageUrl = imageUrl.startsWith('http') ? imageUrl : `http://localhost:5000${imageUrl}`;
+        const fullImageUrl = imageUrl.startsWith('http') ? imageUrl : `http://localhost:5050${imageUrl}`;
         const imageResponse = await fetch(fullImageUrl);
         
         console.log('- Статус изображения:', imageResponse.status);

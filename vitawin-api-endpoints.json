@@ -493,7 +493,7 @@
                 "username": "test_user",
                 "referral_code": "1622907369",
                 "orders_count": 3,
-                "total_spent": 5000.00,
+                "total_spent": 5050.00,
                 "created_at": "2025-07-16T18:43:01.234Z"
               }
             ],
@@ -520,8 +520,8 @@
                 "first_name": "Тестовый",
                 "telegram_id": 1622907369,
                 "level": 1,
-                "total_volume": 15000.00,
-                "personal_volume": 5000.00
+                "total_volume": 15050.00,
+                "personal_volume": 5050.00
               },
               "children": [
                 {

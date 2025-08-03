@@ -30,7 +30,7 @@ services:
 
       # Application
       NODE_ENV: production
-      PORT: 5000
+      PORT: 5050
       JWT_SECRET: "vitawin_jwt_secret_key_production_2025_secure"
 
       # Telegram Bots
@@ -68,7 +68,7 @@ services:
     container_name: vitawin_main_bot
     environment:
       TELEGRAM_BOT_TOKEN: "7610585258:AAGTeZHRbpgjFcgXqcpBhE7yh0mKuwj0owA"
-      API_URL: "http://app:5000"
+      API_URL: "http://app:5050"
       APP_URL: "https://vitawins.ru"
     depends_on:
       app:

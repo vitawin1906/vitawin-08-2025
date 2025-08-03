@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const token = process.env.TELEGRAM_SUPPORT_BOT_TOKEN;
-const apiUrl = process.env.API_URL || 'http://app:5000';
+const apiUrl = process.env.API_URL || 'http://app:5050';
 const appUrl = process.env.APP_URL || 'https://vitawins.ru';
 const supportAdmins = process.env.SUPPORT_ADMINS ? process.env.SUPPORT_ADMINS.split(',') : [];
 

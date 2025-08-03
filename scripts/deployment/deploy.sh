@@ -52,7 +52,7 @@ CDEK_API_ACCOUNT=your_cdek_account
 CDEK_API_SECRET=your_cdek_secret
 RUSSIANPOST_API_KEY=your_russianpost_key
 YANDEX_DELIVERY_API_KEY=your_yandex_delivery_key
-PORT=5000
+PORT=5050
 NODE_ENV=production
 EOL
     echo "❗ ВАЖНО: Отредактируйте файл .env перед продолжением!"
@@ -87,6 +87,6 @@ echo ""
 echo "🌐 Следующие шаги:"
 echo "1. Настройте домен в DNS"
 echo "2. Настройте SSL сертификат: sudo certbot --nginx -d your-domain.com"
-echo "3. Проверьте работу приложения: http://ваш-ip:5000"
+echo "3. Проверьте работу приложения: http://ваш-ip:5050"
 echo ""
 echo "📚 Подробная инструкция в файле DEPLOYMENT_GUIDE.md"

@@ -6,7 +6,7 @@ async function testScriptsConsistency() {
 
     // Проверяем текущие скрипты через публичный API
     console.log('=== ПУБЛИЧНЫЙ API СКРИПТОВ (/api/site-scripts) ===');
-    const publicResponse = await fetch('http://localhost:5000/api/site-scripts');
+    const publicResponse = await fetch('http://localhost:5050/api/site-scripts');
     const publicData = await publicResponse.json();
     
     console.log('Статус:', publicResponse.status);
@@ -31,7 +31,7 @@ async function testScriptsConsistency() {
     console.log('\n=== АДМИНИСТРАТИВНЫЙ API СКРИПТОВ (/api/admin/site-settings) ===');
     
     try {
-      const adminResponse = await fetch('http://localhost:5000/api/admin/site-settings');
+      const adminResponse = await fetch('http://localhost:5050/api/admin/site-settings');
       console.log('Статус административного API:', adminResponse.status);
       
       if (adminResponse.status === 401) {
@@ -79,7 +79,7 @@ async function testScriptsConsistency() {
 
     // Проверяем основную страницу
     try {
-      const frontendResponse = await fetch('http://localhost:5000/');
+      const frontendResponse = await fetch('http://localhost:5050/');
       const htmlContent = await frontendResponse.text();
       
       console.log('Статус главной страницы:', frontendResponse.status);

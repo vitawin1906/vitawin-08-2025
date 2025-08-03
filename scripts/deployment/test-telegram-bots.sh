@@ -12,7 +12,7 @@ if [ -f .env ]; then
     source .env
 fi
 
-APP_URL=${APP_URL:-http://localhost:5000}
+APP_URL=${APP_URL:-http://localhost:5050}
 
 # Функция для тестирования HTTP endpoint
 test_endpoint() {

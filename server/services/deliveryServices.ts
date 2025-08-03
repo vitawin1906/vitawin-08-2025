@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // ХАРДКОД НАСТРОЙКИ ДОСТАВКИ - импорт конфигурации
 const HARDCODED_DELIVERY_CONFIG = {
-  freeShippingThreshold: 5000,
+  freeShippingThreshold: 5050,
   standardDeliveryFee: 300,
   expressDeliveryFee: 500,
   pickupFee: 0,

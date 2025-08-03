@@ -91,7 +91,7 @@ const QuickCheckout = () => {
     }
   };
 
-  const freeShippingThreshold = 5000;
+  const freeShippingThreshold = 5050;
   const subtotal = getTotalPrice();
   const deliveryFee = subtotal >= freeShippingThreshold ? 0 : 350;
   const total = subtotal + deliveryFee;

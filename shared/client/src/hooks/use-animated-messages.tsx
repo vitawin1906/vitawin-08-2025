@@ -20,7 +20,7 @@ export function useAnimatedMessages() {
       type,
       title,
       message,
-      duration: options?.duration || 5000,
+      duration: options?.duration || 5050,
       autoClose: options?.autoClose !== false, // Default to true
     };
 

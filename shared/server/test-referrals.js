@@ -1,7 +1,7 @@
 // Тестирование реферальной системы
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = 'http://localhost:5050/api';
 
 // Создание тестовых пользователей с реферальной цепочкой
 async function setupTestUsers() {

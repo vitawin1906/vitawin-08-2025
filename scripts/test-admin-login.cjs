@@ -5,25 +5,15 @@
  * Использование: node scripts/test-admin-login.cjs <email> <password>
  */
 
+
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 const { Pool } = require('pg');
 
-// Настройки базы данных
 const getDatabaseConfig = () => {
-  if (process.env.DATABASE_URL) {
-    return {
-      connectionString: process.env.DATABASE_URL,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-    };
-  }
-  
   return {
-    host: process.env.PGHOST || 'localhost',
-    port: process.env.PGPORT || 5432,
-    database: process.env.PGDATABASE || 'vitawin',
-    user: process.env.PGUSER || 'postgres',
-    password: process.env.PGPASSWORD || '',
-    ssl: false
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
   };
 };
 

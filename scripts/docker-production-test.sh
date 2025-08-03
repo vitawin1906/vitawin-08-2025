@@ -6,7 +6,7 @@ echo ""
 echo "🔧 Создание production .env файла..."
 cat > .env.production.test << EOF
 NODE_ENV=production
-PORT=5000
+PORT=5050
 DATABASE_URL=postgresql://test_user:test_pass@localhost:5432/vitawin_test
 TELEGRAM_BOT_TOKEN=test_token
 TELEGRAM_SUPPORT_BOT_TOKEN=test_support_token
@@ -118,14 +118,14 @@ echo "   TELEGRAM_SUPPORT_BOT_TOKEN - токен бота поддержки"
 echo ""
 echo "2. 🐳 Команды Docker:"
 echo "   docker build -t vitawin:latest ."
-echo "   docker run -p 5000:5000 --env-file .env.production vitawin:latest"
+echo "   docker run -p 5050:5050 --env-file .env.production vitawin:latest"
 echo ""
 echo "3. 🚀 Docker Compose:"
 echo "   docker-compose up -d"
 echo "   docker-compose logs -f app"
 echo ""
 echo "4. 🔧 Проверка здоровья:"
-echo "   curl http://localhost:5000/health"
+echo "   curl http://localhost:5050/health"
 echo "   docker ps"
 echo ""
 

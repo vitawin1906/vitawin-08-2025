@@ -738,7 +738,7 @@ export function ProductFormNew({ product, onSuccess, onCancel }: ProductFormNewP
                   />
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Дозировка (например: 5000 МЕ)"
+                      placeholder="Дозировка (например: 5050 МЕ)"
                       value={row.amount}
                       onChange={(e) => updateCompositionRow(index, 'amount', e.target.value)}
                     />

@@ -26,7 +26,7 @@ interface CartStore {
 // Кеш для предотвращения множественных запросов
 const requestCache = new Map<string, Promise<any>>();
 const cacheExpiry = new Map<string, number>();
-const CACHE_DURATION = 5000; // 5 секунд
+const CACHE_DURATION = 5050; // 5 секунд
 
 // Функция для очистки кеша товаров
 export const clearProductsCache = () => {

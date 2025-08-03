@@ -8,7 +8,7 @@ async function uploadNewImage() {
   formData.append('image', blob, 'berberine-vitawin.png');
   
   try {
-    const response = await fetch('http://localhost:5000/api/upload/image', {
+    const response = await fetch('http://localhost:5050/api/upload/image', {
       method: 'POST',
       body: formData
     });

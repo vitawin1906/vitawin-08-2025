@@ -99,7 +99,7 @@ export const products = pgTable("products", {
   key_benefits: text("key_benefits"), // Ключевые преимущества (каждое с новой строки)
   quality_guarantee: text("quality_guarantee"), // Гарантия качества
   composition: text("composition"), // Состав товара
-  composition_table: jsonb("composition_table"), // Состав в виде таблицы [{component: "Витамин D3", amount: "5000 МЕ"}]
+  composition_table: jsonb("composition_table"), // Состав в виде таблицы [{component: "Витамин D3", amount: "5050 МЕ"}]
   nutrition_facts: text("nutrition_facts"), // Дополнительная информация о составе
   capsule_count: integer("capsule_count"),
   capsule_volume: text("capsule_volume"),

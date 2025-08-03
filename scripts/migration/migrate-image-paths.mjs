@@ -43,7 +43,7 @@ async function migrateImagePaths() {
         };
 
         try {
-          const updateResponse = await fetch(`http://localhost:5000/api/admin/products/${product.id}`, {
+          const updateResponse = await fetch(`http://localhost:5050/api/admin/products/${product.id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ async function migrateImagePaths() {
       
       // Проверяем результат
       console.log('\nПроверяем результат...');
-      const checkResponse = await fetch('http://localhost:5000/api/products');
+      const checkResponse = await fetch('http://localhost:5050/api/products');
       const checkData = await checkResponse.json();
       
       let correctPaths = 0;

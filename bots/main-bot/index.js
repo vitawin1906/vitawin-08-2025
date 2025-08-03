@@ -9,7 +9,7 @@ dotenv.config();
 console.log('🔍 Доступные переменные окружения:', Object.keys(process.env).filter(k => k.includes('TELEGRAM')));
 const token = process.env.TELEGRAM_BOT_TOKEN;
 console.log('🔑 Токен бота:', token ? `${token.substring(0, 10)}...` : 'НЕ НАЙДЕН');
-const apiUrl = process.env.API_URL || 'http://localhost:5000';
+const apiUrl = process.env.API_URL || 'http://localhost:5050';
 const appUrl = process.env.APP_URL || 'https://vitawins.ru';
 
 if (!token) {

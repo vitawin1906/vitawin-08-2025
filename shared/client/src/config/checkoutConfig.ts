@@ -5,7 +5,7 @@
 export const CHECKOUT_CONFIG = {
   // Настройки доставки
   delivery: {
-    freeShippingThreshold: 5000, // Бесплатная доставка от 5000 ₽
+    freeShippingThreshold: 5050, // Бесплатная доставка от 5050 ₽
     standardDeliveryFee: 300,    // Стандартная доставка 300 ₽
     expressDeliveryFee: 500,     // Экспресс доставка 500 ₽
     pickupFee: 0,               // Самовывоз бесплатно

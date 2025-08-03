@@ -169,7 +169,7 @@ const ProductInfo = ({ product, onAddToCart }: ProductInfoProps) => {
         </div>
         <div className="flex items-center space-x-2">
           <TruckIcon className="h-5 w-5 text-emerald-600" />
-          <span className="text-sm font-medium text-gray-900">Бесплатная доставка при заказе от 5000 ₽</span>
+          <span className="text-sm font-medium text-gray-900">Бесплатная доставка при заказе от 5050 ₽</span>
         </div>
       </div>
       {/* Buttons - показываем над характеристиками на мобильной версии */}

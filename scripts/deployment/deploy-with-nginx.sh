@@ -86,7 +86,7 @@ echo "⏳ Ждем готовности базы данных..."
 timeout 60s bash -c 'until docker-compose exec -T postgres pg_isready -U vitawin_user -d vitawin; do sleep 2; done'
 
 echo "⏳ Ждем готовности приложения..."
-timeout 60s bash -c 'until curl -f http://localhost:5000/health &>/dev/null; do sleep 2; done'
+timeout 60s bash -c 'until curl -f http://localhost:5050/health &>/dev/null; do sleep 2; done'
 
 # Проверяем Nginx
 echo "🌐 Проверяем Nginx..."

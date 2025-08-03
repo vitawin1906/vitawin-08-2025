@@ -70,7 +70,7 @@ echo "✅ PostgreSQL готов"
 
 # Проверяем приложение
 echo "🌐 Проверяем приложение..."
-timeout 60s bash -c 'until curl -f http://localhost:5000/health &>/dev/null; do sleep 2; done'
+timeout 60s bash -c 'until curl -f http://localhost:5050/health &>/dev/null; do sleep 2; done'
 echo "✅ Приложение готово"
 
 # Проверяем Nginx

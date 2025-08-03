@@ -42,11 +42,11 @@ RUN mkdir -p uploads/images logs && \
 USER vitawin
 
 # Экспонируем порт
-EXPOSE 5000
+EXPOSE 5050
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:5000/api/health || exit 1
+  CMD curl -f http://localhost:5050/api/health || exit 1
 
 # Запускаем приложение
 CMD ["node", "dist/index.js"]

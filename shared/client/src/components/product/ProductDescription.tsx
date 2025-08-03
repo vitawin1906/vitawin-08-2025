@@ -14,7 +14,7 @@ const ProductDescription = ({ description, benefits = [], composition = [] }: Pr
   ];
 
   const defaultComposition = [
-    { name: "Витамин D3", amount: "5000 МЕ" },
+    { name: "Витамин D3", amount: "5050 МЕ" },
     { name: "Оливковое масло", amount: "200 мг" },
     { name: "Желатин (капсула)", amount: "100 мг" }
   ];

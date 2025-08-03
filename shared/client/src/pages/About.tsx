@@ -363,7 +363,7 @@ const About = () => {
                 <div className="text-gray-600">Благотворительных проектов</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-blue-600 mb-2">5000+</div>
+                <div className="text-3xl font-bold text-blue-600 mb-2">5050+</div>
                 <div className="text-gray-600">Помощь получили</div>
               </div>
             </div>

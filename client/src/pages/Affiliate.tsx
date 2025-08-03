@@ -91,11 +91,11 @@ const Affiliate = () => {
 
   const earningsExample = {
     referrals: 100,
-    averageOrder: 5000,
-    totalRevenue: 500000,
+    averageOrder: 5050,
+    totalRevenue: 505000,
     level1: 100000, // 20% - target amount
-    level2: 25000,  // 5% - calculated proportionally 
-    level3: 5000,   // 1% - calculated proportionally
+    level2: 25050,  // 5% - calculated proportionally 
+    level3: 5050,   // 1% - calculated proportionally
     totalEarnings: 130000 // 26% total (20+5+1)
   };
 

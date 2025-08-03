@@ -21,7 +21,7 @@ async function testImageUpload() {
   formData.append('image', blob, 'berberin-product.png');
   
   try {
-    const response = await fetch('http://localhost:5000/api/upload/image', {
+    const response = await fetch('http://localhost:5050/api/upload/image', {
       method: 'POST',
       body: formData
     });
@@ -31,7 +31,7 @@ async function testImageUpload() {
     
     if (response.ok) {
       // Проверяем, что изображение доступно через API
-      const imageResponse = await fetch(`http://localhost:5000${result.url}`);
+      const imageResponse = await fetch(`http://localhost:5050${result.url}`);
       console.log('Проверка загруженного изображения:', imageResponse.status);
     }
   } catch (error) {
