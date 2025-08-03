@@ -79,7 +79,7 @@ if (!connectionString) {
 
 const pool = new Pool({
   connectionString,
-  ssl: false  // SSL отключен для всех окружений (Replit, Docker, localhost)
+  ssl: { rejectUnauthorized: false }
 });
 
 export const db = drizzle(pool);
