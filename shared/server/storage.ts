@@ -66,7 +66,7 @@ import {
 // Docker production configuration
 const connectionString = process.env.DATABASE_URL || 
   (process.env.NODE_ENV === 'production' 
-    ? 'postgresql://vitawin_user:vitawin_secure_password_2025@postgres:5432/vitawin'
+    ? 'postgresql://neondb_owner:npg_iOdB2j1aJWeG@ep-damp-field-ab1az6n6-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require'
     : 'postgresql://vitawin_user:strong_password_123@localhost:5432/vitawin');
 
 console.log("PostgreSQL connection initialized");

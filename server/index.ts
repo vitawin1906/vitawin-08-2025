@@ -24,10 +24,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Фикс CORS для manifest.json
 app.get('/manifest.json', (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.sendFile(path.join(process.cwd(), 'public', 'manifest.json'));
 });
+
 app.use(sanitizeInput);
 app.use(databaseQueryProtection);
 
@@ -132,7 +134,7 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // ALWAYS serve the app on port 5000
+  // ALWAYS serve the app on port 5050
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5050;
