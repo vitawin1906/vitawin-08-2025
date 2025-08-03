@@ -1,0 +1,19 @@
+# Тестовый Dockerfile для проверки сборки
+FROM node:20-slim AS test-build
+
+WORKDIR /app
+
+# Копируем только package.json для установки зависимостей
+COPY package.json package-lock.json ./
+
+# Устанавливаем зависимости
+RUN npm ci --only=production
+
+# Копируем исходный код
+COPY . .
+
+# Простая сборка с vite
+RUN npm run build:test || echo "Build test failed"
+
+# Показываем что получилось
+RUN ls -la dist/ || echo "No dist directory"

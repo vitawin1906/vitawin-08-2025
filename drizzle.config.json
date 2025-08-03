@@ -1,0 +1,8 @@
+{
+  "out": "./migrations",
+  "schema": "./shared/schema.ts",
+  "dialect": "postgresql",
+  "dbCredentials": {
+    "url": "postgresql://vitawin_user:strong_password_123@vitawin_postgres:5432/vitawin"
+  }
+} 

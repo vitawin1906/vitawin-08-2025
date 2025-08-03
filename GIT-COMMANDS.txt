@@ -1,0 +1,22 @@
+# Git команды для пуша VitaWin на GitHub
+
+# После скачивания проекта из Replit:
+
+git init
+git checkout -b replit-agent
+git add .
+git commit -m "🚀 VitaWin: Полная e-commerce платформа с MLM системой
+
+✅ Включено:
+- Полный исходный код (React + Node.js + TypeScript)  
+- Docker архитектура (6 сервисов: app, postgres, redis, nginx, 2 бота)
+- Текущие данные БД (105KB дамп с 8 товарами и 9 пользователями)
+- 174+ изображения товаров
+- Telegram боты (@vitawin_bot, @vitawin_support_bot)
+- SSL ready конфигурация для vitawins.ru
+- Автоматический скрипт установки setup-production.sh
+
+🎯 Готово к развертыванию одной командой: docker-compose up -d"
+
+git remote add origin https://github.com/YOUR_USERNAME/vitawin.git
+git push -u origin replit-agent

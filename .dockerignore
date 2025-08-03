@@ -1,0 +1,36 @@
+# Исключаем для минимизации размера образа, но не игнорируем полностью
+node_modules
+.git
+*.log
+.env*
+.DS_Store
+Thumbs.db
+
+# Временные файлы
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# IDE файлы
+.vscode
+.idea
+*.sublime-*
+
+# Тестовые файлы
+coverage/
+.nyc_output
+test-results/
+
+# Build артефакты (будут пересобраны)
+dist/
+build/
+
+# Архивы и бэкапы
+*.tar.gz
+*.zip
+backup*/
+
+# Логи
+logs/
+*.log

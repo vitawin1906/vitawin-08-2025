@@ -1,0 +1,3 @@
+# SSL certificates will be placed here
+# For development: generate self-signed certificates
+# For production: use Let's Encrypt certificates

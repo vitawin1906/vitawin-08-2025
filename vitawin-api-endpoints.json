@@ -1,0 +1,693 @@
+{
+  "vitawin_api_endpoints": {
+    "description": "Полный список всех API эндпоинтов VitaWin платформы с реальными примерами запросов и ответов",
+    "base_url": "https://vitawins.ru",
+    "admin_credentials": {
+      "email": "admin@vitawins.ru",
+      "password": "VitawinAdmin2025!"
+    },
+    "test_telegram_id": 1622907369,
+    "test_user_data": {
+      "first_name": "Тестовый",
+      "username": "test_user",
+      "telegram_id": 1622907369
+    },
+    "endpoints": {
+      "health_check": {
+        "method": "GET",
+        "url": "/health",
+        "description": "Проверка состояния сервера",
+        "auth_required": false,
+        "example_request": "curl -X GET https://vitawins.ru/health",
+        "example_response": {
+          "status": "healthy",
+          "timestamp": "2025-07-16T18:43:01.234Z",
+          "uptime": 123.456,
+          "memory": {
+            "rss": 123456789,
+            "heapTotal": 87654321,
+            "heapUsed": 65432109
+          },
+          "version": "1.0.0"
+        }
+      },
+      "authentication": {
+        "telegram_auth": {
+          "method": "POST",
+          "url": "/api/auth/telegram",
+          "description": "Авторизация через Telegram",
+          "auth_required": false,
+          "example_request": "curl -X POST https://vitawins.ru/api/auth/telegram -H 'Content-Type: application/json' -d '{\"telegram_id\": 1622907369, \"first_name\": \"Тестовый\", \"username\": \"test_user\", \"referral_code\": \"ref123\"}'",
+          "request_body": {
+            "telegram_id": 1622907369,
+            "first_name": "Тестовый",
+            "username": "test_user",
+            "referral_code": "ref123"
+          },
+          "example_response": {
+            "success": true,
+            "user": {
+              "id": 1,
+              "telegram_id": 1622907369,
+              "first_name": "Тестовый",
+              "username": "test_user",
+              "referral_code": "1622907369"
+            },
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        },
+        "get_user": {
+          "method": "GET",
+          "url": "/api/user",
+          "description": "Получить данные авторизованного пользователя",
+          "auth_required": true,
+          "example_request": "curl -X GET https://vitawins.ru/api/user -H 'Authorization: Bearer YOUR_TOKEN'",
+          "example_response": {
+            "success": true,
+            "user": {
+              "id": 1,
+              "telegram_id": 1622907369,
+              "first_name": "Тестовый",
+              "username": "test_user",
+              "referral_code": "1622907369",
+              "is_admin": false,
+              "created_at": "2025-07-16T18:43:01.234Z"
+            }
+          }
+        }
+      },
+      "admin_auth": {
+        "admin_captcha": {
+          "method": "GET",
+          "url": "/api/admin/captcha",
+          "description": "Получить капчу для входа в админку",
+          "auth_required": false,
+          "example_request": "curl -X GET https://vitawins.ru/api/admin/captcha",
+          "example_response": {
+            "success": true,
+            "captcha": "data:image/svg+xml;base64,PHN2Zy...",
+            "token": "captcha_token_123"
+          }
+        },
+        "admin_login": {
+          "method": "POST",
+          "url": "/api/admin/login",
+          "description": "Вход в админ-панель",
+          "auth_required": false,
+          "example_request": "curl -X POST https://vitawins.ru/api/admin/login -H 'Content-Type: application/json' -d '{\"email\": \"admin@vitawins.ru\", \"password\": \"VitawinAdmin2025!\", \"captcha\": \"ABCD\", \"captchaToken\": \"captcha_token_123\"}'",
+          "request_body": {
+            "email": "admin@vitawins.ru",
+            "password": "VitawinAdmin2025!",
+            "captcha": "ABCD",
+            "captchaToken": "captcha_token_123"
+          },
+          "example_response": {
+            "success": true,
+            "message": "Admin login successful",
+            "admin": {
+              "id": 1,
+              "email": "admin@vitawins.ru"
+            },
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        }
+      },
+      "products": {
+        "get_products": {
+          "method": "GET",
+          "url": "/api/products",
+          "description": "Получить список товаров",
+          "auth_required": false,
+          "example_request": "curl -X GET 'https://vitawins.ru/api/products?limit=10&offset=0'",
+          "query_params": {
+            "limit": 10,
+            "offset": 0,
+            "category": "supplements"
+          },
+          "example_response": {
+            "success": true,
+            "products": [
+              {
+                "id": 18,
+                "name": "Тестовый товар",
+                "description": "Описание тестового товара",
+                "price": 1000.00,
+                "original_price": 1200.00,
+                "images": ["test_image.jpg"],
+                "category": "supplements",
+                "in_stock": true,
+                "pv": 5,
+                "cashback_percentage": 10
+              }
+            ],
+            "pagination": {
+              "total": 25,
+              "limit": 10,
+              "offset": 0,
+              "page": 1,
+              "totalPages": 3
+            }
+          }
+        },
+        "get_product": {
+          "method": "GET",
+          "url": "/api/product/:id",
+          "description": "Получить конкретный товар по ID",
+          "auth_required": false,
+          "example_request": "curl -X GET https://vitawins.ru/api/product/18",
+          "example_response": {
+            "success": true,
+            "product": {
+              "id": 18,
+              "name": "Тестовый товар",
+              "description": "Полное описание товара",
+              "price": 1000.00,
+              "original_price": 1200.00,
+              "images": ["test_image.jpg"],
+              "category": "supplements",
+              "in_stock": true,
+              "pv": 5,
+              "cashback_percentage": 10,
+              "composition": "Состав товара",
+              "usage_instructions": "Инструкция по применению"
+            }
+          }
+        }
+      },
+      "cart": {
+        "get_cart": {
+          "method": "GET",
+          "url": "/api/cart",
+          "description": "Получить корзину пользователя",
+          "auth_required": false,
+          "example_request": "curl -X GET https://vitawins.ru/api/cart -H 'Cookie: sessionId=session_123'",
+          "example_response": {
+            "success": true,
+            "items": [
+              {
+                "id": 1,
+                "product_id": 18,
+                "quantity": 2,
+                "product": {
+                  "id": 18,
+                  "name": "Тестовый товар",
+                  "price": 1000.00,
+                  "images": ["test_image.jpg"]
+                }
+              }
+            ],
+            "total": 2000.00,
+            "total_items": 2
+          }
+        },
+        "update_cart": {
+          "method": "POST",
+          "url": "/api/cart",
+          "description": "Добавить/обновить товар в корзине",
+          "auth_required": false,
+          "example_request": "curl -X POST https://vitawins.ru/api/cart -H 'Content-Type: application/json' -d '{\"product_id\": 18, \"quantity\": 2}'",
+          "request_body": {
+            "product_id": 18,
+            "quantity": 2
+          },
+          "example_response": {
+            "success": true,
+            "message": "Item added to cart",
+            "cart_item": {
+              "id": 1,
+              "product_id": 18,
+              "quantity": 2
+            }
+          }
+        }
+      },
+      "orders": {
+        "create_order": {
+          "method": "POST",
+          "url": "/api/orders/create",
+          "description": "Создать заказ",
+          "auth_required": true,
+          "example_request": "curl -X POST https://vitawins.ru/api/orders/create -H 'Authorization: Bearer YOUR_TOKEN' -H 'Content-Type: application/json' -d '{\"items\": [{\"product_id\": 18, \"quantity\": 1}], \"customer_info\": {\"name\": \"Иван Иванов\", \"phone\": \"+79123456789\", \"email\": \"test@example.com\"}, \"delivery_type\": \"courier\", \"delivery_address\": \"Москва, ул. Тестовая, 1\", \"payment_method\": \"card\"}'",
+          "request_body": {
+            "items": [
+              {
+                "product_id": 18,
+                "quantity": 1
+              }
+            ],
+            "customer_info": {
+              "name": "Иван Иванов",
+              "phone": "+79123456789",
+              "email": "test@example.com"
+            },
+            "delivery_type": "courier",
+            "delivery_address": "Москва, ул. Тестовая, 1",
+            "payment_method": "card",
+            "referral_code": "1622907369"
+          },
+          "example_response": {
+            "success": true,
+            "order": {
+              "id": 1,
+              "total": 1000.00,
+              "status": "pending",
+              "payment_status": "pending",
+              "created_at": "2025-07-16T18:43:01.234Z"
+            }
+          }
+        },
+        "get_orders": {
+          "method": "GET",
+          "url": "/api/orders",
+          "description": "Получить заказы пользователя",
+          "auth_required": true,
+          "example_request": "curl -X GET https://vitawins.ru/api/orders -H 'Authorization: Bearer YOUR_TOKEN'",
+          "example_response": {
+            "success": true,
+            "orders": [
+              {
+                "id": 1,
+                "total": 1000.00,
+                "status": "delivered",
+                "payment_status": "paid",
+                "created_at": "2025-07-16T18:43:01.234Z",
+                "items": [
+                  {
+                    "product_id": 18,
+                    "quantity": 1,
+                    "price": 1000.00
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "referral": {
+        "get_stats": {
+          "method": "GET",
+          "url": "/api/referral/stats",
+          "description": "Получить реферальную статистику",
+          "auth_required": true,
+          "example_request": "curl -X GET https://vitawins.ru/api/referral/stats -H 'Authorization: Bearer YOUR_TOKEN'",
+          "example_response": {
+            "success": true,
+            "stats": {
+              "referral_code": "1622907369",
+              "total_referrals": 5,
+              "total_bonus": 2500.00,
+              "pending_bonus": 500.00,
+              "paid_bonus": 2000.00,
+              "referrals": [
+                {
+                  "id": 2,
+                  "first_name": "Анна",
+                  "username": "anna_user",
+                  "registration_date": "2025-07-15T10:00:00.000Z",
+                  "orders_count": 2,
+                  "total_spent": 3000.00
+                }
+              ]
+            }
+          }
+        },
+        "apply_referral": {
+          "method": "POST",
+          "url": "/api/referral/apply",
+          "description": "Применить реферальный код",
+          "auth_required": true,
+          "example_request": "curl -X POST https://vitawins.ru/api/referral/apply -H 'Authorization: Bearer YOUR_TOKEN' -H 'Content-Type: application/json' -d '{\"referral_code\": \"1234567890\"}'",
+          "request_body": {
+            "referral_code": "1234567890"
+          },
+          "example_response": {
+            "success": true,
+            "message": "Referral code applied successfully",
+            "referrer": {
+              "first_name": "Максим",
+              "username": "maxim_user"
+            }
+          }
+        }
+      },
+      "blog": {
+        "get_posts": {
+          "method": "GET",
+          "url": "/api/blog",
+          "description": "Получить список статей блога",
+          "auth_required": false,
+          "example_request": "curl -X GET 'https://vitawins.ru/api/blog?limit=10&offset=0'",
+          "query_params": {
+            "limit": 10,
+            "offset": 0,
+            "published": true
+          },
+          "example_response": {
+            "success": true,
+            "posts": [
+              {
+                "id": 6,
+                "title": "fsfsf",
+                "content": "<p>Содержимое статьи</p>",
+                "slug": "fsfsf",
+                "published": true,
+                "created_at": "2025-07-16T18:43:01.234Z",
+                "author_id": 1
+              }
+            ],
+            "pagination": {
+              "total": 5,
+              "limit": 10,
+              "offset": 0
+            }
+          }
+        },
+        "get_post": {
+          "method": "GET",
+          "url": "/api/blog/:id",
+          "description": "Получить конкретную статью",
+          "auth_required": false,
+          "example_request": "curl -X GET https://vitawins.ru/api/blog/6",
+          "example_response": {
+            "success": true,
+            "post": {
+              "id": 6,
+              "title": "fsfsf",
+              "content": "<p>Полное содержимое статьи</p>",
+              "slug": "fsfsf",
+              "published": true,
+              "created_at": "2025-07-16T18:43:01.234Z",
+              "author_id": 1,
+              "related_products": [18, 19]
+            }
+          }
+        }
+      },
+      "admin_products": {
+        "get_admin_products": {
+          "method": "GET",
+          "url": "/api/admin/products",
+          "description": "Получить товары для админки",
+          "auth_required": true,
+          "admin_required": true,
+          "example_request": "curl -X GET https://vitawins.ru/api/admin/products -H 'Cookie: adminToken=ADMIN_TOKEN'",
+          "example_response": {
+            "success": true,
+            "products": [
+              {
+                "id": 18,
+                "name": "Тестовый товар",
+                "price": 1000.00,
+                "original_price": 1200.00,
+                "category": "supplements",
+                "in_stock": true,
+                "created_at": "2025-07-16T18:43:01.234Z"
+              }
+            ]
+          }
+        },
+        "create_product": {
+          "method": "POST",
+          "url": "/api/admin/products",
+          "description": "Создать новый товар",
+          "auth_required": true,
+          "admin_required": true,
+          "example_request": "curl -X POST https://vitawins.ru/api/admin/products -H 'Cookie: adminToken=ADMIN_TOKEN' -H 'Content-Type: application/json' -d '{\"name\": \"Новый товар\", \"description\": \"Описание\", \"price\": 1500, \"category\": \"supplements\", \"images\": [\"new_product.jpg\"]}'",
+          "request_body": {
+            "name": "Новый товар",
+            "description": "Описание нового товара",
+            "price": 1500,
+            "original_price": 1800,
+            "category": "supplements",
+            "images": ["new_product.jpg"],
+            "in_stock": true,
+            "pv": 7,
+            "cashback_percentage": 12
+          },
+          "example_response": {
+            "success": true,
+            "message": "Product created successfully",
+            "product": {
+              "id": 21,
+              "name": "Новый товар",
+              "price": 1500,
+              "created_at": "2025-07-16T18:43:01.234Z"
+            }
+          }
+        }
+      },
+      "admin_blog": {
+        "create_blog_post": {
+          "method": "POST",
+          "url": "/api/blog",
+          "description": "Создать статью блога (админ)",
+          "auth_required": true,
+          "admin_required": true,
+          "example_request": "curl -X POST https://vitawins.ru/api/blog -H 'Cookie: adminToken=ADMIN_TOKEN' -H 'Content-Type: application/json' -d '{\"title\": \"Новая статья\", \"content\": \"<p>Содержимое статьи</p>\", \"slug\": \"novaya-statya\", \"published\": true}'",
+          "request_body": {
+            "title": "Новая статья",
+            "content": "<p>Содержимое новой статьи</p>",
+            "slug": "novaya-statya",
+            "published": true,
+            "related_products": [18, 19]
+          },
+          "example_response": {
+            "success": true,
+            "message": "Blog post created successfully",
+            "post": {
+              "id": 7,
+              "title": "Новая статья",
+              "slug": "novaya-statya-1752736000",
+              "created_at": "2025-07-16T18:43:01.234Z"
+            }
+          }
+        },
+        "delete_blog_post": {
+          "method": "DELETE",
+          "url": "/api/blog/:id",
+          "description": "Удалить статью блога",
+          "auth_required": true,
+          "admin_required": true,
+          "example_request": "curl -X DELETE https://vitawins.ru/api/blog/6 -H 'Cookie: adminToken=ADMIN_TOKEN'",
+          "example_response": {
+            "success": true,
+            "message": "Blog post deleted successfully"
+          }
+        }
+      },
+      "admin_users": {
+        "get_users": {
+          "method": "GET",
+          "url": "/api/admin/users",
+          "description": "Получить список пользователей",
+          "auth_required": true,
+          "admin_required": true,
+          "example_request": "curl -X GET 'https://vitawins.ru/api/admin/users?limit=20&offset=0' -H 'Cookie: adminToken=ADMIN_TOKEN'",
+          "example_response": {
+            "success": true,
+            "users": [
+              {
+                "id": 1,
+                "telegram_id": 1622907369,
+                "first_name": "Тестовый",
+                "username": "test_user",
+                "referral_code": "1622907369",
+                "orders_count": 3,
+                "total_spent": 5000.00,
+                "created_at": "2025-07-16T18:43:01.234Z"
+              }
+            ],
+            "pagination": {
+              "total": 15,
+              "limit": 20,
+              "offset": 0
+            }
+          }
+        }
+      },
+      "mlm": {
+        "get_network_tree": {
+          "method": "GET",
+          "url": "/api/mlm/network/my-tree",
+          "description": "Получить дерево реферальной сети пользователя",
+          "auth_required": true,
+          "example_request": "curl -X GET https://vitawins.ru/api/mlm/network/my-tree -H 'Authorization: Bearer YOUR_TOKEN'",
+          "example_response": {
+            "success": true,
+            "tree": {
+              "user": {
+                "id": 1,
+                "first_name": "Тестовый",
+                "telegram_id": 1622907369,
+                "level": 1,
+                "total_volume": 15000.00,
+                "personal_volume": 5000.00
+              },
+              "children": [
+                {
+                  "user": {
+                    "id": 2,
+                    "first_name": "Анна",
+                    "telegram_id": 1234567890,
+                    "level": 2,
+                    "total_volume": 8000.00,
+                    "personal_volume": 3000.00
+                  },
+                  "children": []
+                }
+              ]
+            }
+          }
+        }
+      },
+      "upload": {
+        "upload_image": {
+          "method": "POST",
+          "url": "/api/upload/image",
+          "description": "Загрузить изображение",
+          "auth_required": true,
+          "admin_required": true,
+          "example_request": "curl -X POST https://vitawins.ru/api/upload/image -H 'Cookie: adminToken=ADMIN_TOKEN' -F 'image=@/path/to/image.jpg'",
+          "example_response": {
+            "success": true,
+            "message": "Image uploaded successfully",
+            "filename": "uploaded_image_1752736000.jpg",
+            "url": "/api/uploads/uploaded_image_1752736000.jpg"
+          }
+        },
+        "get_image": {
+          "method": "GET",
+          "url": "/api/uploads/:filename",
+          "description": "Получить изображение",
+          "auth_required": false,
+          "example_request": "curl -X GET https://vitawins.ru/api/uploads/test_image.jpg",
+          "example_response": "Binary image data with appropriate headers"
+        }
+      },
+      "settings": {
+        "get_site_scripts": {
+          "method": "GET",
+          "url": "/api/site-scripts",
+          "description": "Получить скрипты для сайта (метрики, аналитика)",
+          "auth_required": false,
+          "example_request": "curl -X GET https://vitawins.ru/api/site-scripts",
+          "example_response": {
+            "success": true,
+            "scripts": {
+              "head_scripts": "<script>console.log('head script');</script>",
+              "body_scripts": "<script>console.log('body script');</script>"
+            }
+          }
+        }
+      },
+      "telegram": {
+        "webhook": {
+          "method": "POST",
+          "url": "/api/telegram/webhook",
+          "description": "Webhook для основного Telegram бота",
+          "auth_required": false,
+          "example_request": "curl -X POST https://vitawins.ru/api/telegram/webhook -H 'Content-Type: application/json' -d '{\"message\": {\"from\": {\"id\": 1622907369, \"first_name\": \"Тестовый\"}, \"text\": \"/start\"}}'",
+          "request_body": {
+            "message": {
+              "from": {
+                "id": 1622907369,
+                "first_name": "Тестовый",
+                "username": "test_user"
+              },
+              "text": "/start"
+            }
+          },
+          "example_response": {
+            "success": true,
+            "message": "Webhook processed"
+          }
+        }
+      },
+      "payment": {
+        "create_payment": {
+          "method": "POST",
+          "url": "/api/payment/create",
+          "description": "Создать платеж",
+          "auth_required": true,
+          "example_request": "curl -X POST https://vitawins.ru/api/payment/create -H 'Authorization: Bearer YOUR_TOKEN' -H 'Content-Type: application/json' -d '{\"order_id\": 1, \"amount\": 1000, \"description\": \"Оплата заказа #1\"}'",
+          "request_body": {
+            "order_id": 1,
+            "amount": 1000,
+            "description": "Оплата заказа #1"
+          },
+          "example_response": {
+            "success": true,
+            "payment_url": "https://securepayments.tinkoff.ru/...",
+            "payment_id": "payment_123456"
+          }
+        }
+      }
+    },
+    "common_errors": {
+      "401": {
+        "description": "Unauthorized - требуется авторизация",
+        "example": {
+          "error": "Unauthorized",
+          "message": "Authentication required"
+        }
+      },
+      "403": {
+        "description": "Forbidden - недостаточно прав (админ доступ)",
+        "example": {
+          "error": "Access denied",
+          "message": "Administrator privileges required"
+        }
+      },
+      "404": {
+        "description": "Not Found - ресурс не найден",
+        "example": {
+          "error": "Not found",
+          "message": "Resource not found"
+        }
+      },
+      "500": {
+        "description": "Internal Server Error - ошибка сервера",
+        "example": {
+          "error": "Server error",
+          "message": "Internal server error occurred"
+        }
+      }
+    },
+    "authentication_info": {
+      "user_auth": {
+        "type": "JWT Bearer Token",
+        "header": "Authorization: Bearer TOKEN",
+        "description": "Получается через /api/auth/telegram"
+      },
+      "admin_auth": {
+        "type": "Cookie",
+        "header": "Cookie: adminToken=TOKEN",
+        "description": "Получается через /api/admin/login"
+      }
+    },
+    "testing_notes": {
+      "admin_login": "Используйте admin@vitawins.ru / VitawinAdmin2025! для входа в админку",
+      "test_data": "В базе есть товары с ID 18, 19, 20 и статья блога с ID 6",
+      "telegram_id": "Используйте 1622907369 как тестовый telegram_id",
+      "referral_code": "Реферальные коды совпадают с telegram_id пользователей",
+      "test_results": {
+        "last_tested": "2025-07-16T08:52:00Z",
+        "success_rate": "88.9%",
+        "passed_tests": 8,
+        "failed_tests": 1,
+        "working_endpoints": [
+          "GET /health",
+          "GET /api/products",
+          "GET /api/blog", 
+          "GET /api/site-scripts",
+          "GET /api/cart",
+          "POST /api/cart",
+          "GET /api/mlm/levels"
+        ],
+        "issues": [
+          "GET /api/user/telegram/{id} возвращает 500 ошибку"
+        ]
+      }
+    }
+  }
+}
