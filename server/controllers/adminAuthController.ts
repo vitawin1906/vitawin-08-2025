@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { storage } from '../storage';
-import { adminLoginSchema, AdminUser } from '@shared/schema';
+import {  } from '@shared/schema';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
 

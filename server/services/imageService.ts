@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { eq, and } from "drizzle-orm";
-import { uploadedImages } from "@shared/schema";
+import { uploaded_images } from "@shared/schema";
 import fs from "fs";
 import path from "path";
 import { promisify } from "util";
@@ -64,13 +64,13 @@ export class ImageService {
     // Если это основное изображение, сбрасываем флаг у других изображений товара
     if (isPrimary && productId) {
       await db
-        .update(uploadedImages)
+        .update(uploaded_images)
         .set({ is_primary: false })
-        .where(eq(uploadedImages.product_id, productId));
+        .where(eq(uploaded_images.product_id, productId));
     }
 
     // Записываем метаданные в БД (БЕЗ image_data)
-    await db.insert(uploadedImages).values({
+    await db.insert(uploaded_images).values({
       filename,
       original_filename: originalFilename,
       mime_type: mimeType,
@@ -86,11 +86,11 @@ export class ImageService {
   /**
    * Получает изображение из файловой системы
    */
-  async getImage(filename: string): Promise<{ buffer: Buffer; mimeType: string } | null> {
+  async getImage(filename: string): Promise<{ buffer: Buffer; mimeType: string | null } | null> {
     const result = await db
       .select()
-      .from(uploadedImages)
-      .where(eq(uploadedImages.filename, filename))
+      .from(uploaded_images)
+      .where(eq(uploaded_images.filename, filename))
       .limit(1);
 
     if (result.length === 0) {
@@ -115,7 +115,7 @@ export class ImageService {
   /**
    * Удаляет изображение из файловой системы и БД
    */
-  async deleteImage(filename: string): Promise<boolean> {
+  async deleteImage(filename: string): Promise<boolean | undefined> {
     const filePath = path.join(this.imagesDir, filename);
 
     try {
@@ -126,10 +126,11 @@ export class ImageService {
 
       // Удаляем запись из БД
       const result = await db
-        .delete(uploadedImages)
-        .where(eq(uploadedImages.filename, filename));
-
-      return result.rowCount > 0;
+        .delete(uploaded_images)
+        .where(eq(uploaded_images.filename, filename));
+      if(result && result.rowCount){
+        return result.rowCount > 0;
+      }
     } catch (error) {
       console.error(`Ошибка удаления файла ${filename}:`, error);
       return false;
@@ -142,12 +143,12 @@ export class ImageService {
   async getProductImages(productId: number): Promise<Array<{ filename: string; isPrimary: boolean; displayOrder: number }>> {
     const result = await db
       .select({
-        filename: uploadedImages.filename,
-        isPrimary: uploadedImages.is_primary,
-        displayOrder: uploadedImages.display_order,
+        filename: uploaded_images.filename,
+        isPrimary: uploaded_images.is_primary,
+        displayOrder: uploaded_images.display_order,
       })
-      .from(uploadedImages)
-      .where(eq(uploadedImages.product_id, productId));
+      .from(uploaded_images)
+      .where(eq(uploaded_images.product_id, productId));
 
     return result.map(item => ({
       filename: item.filename,
@@ -161,12 +162,12 @@ export class ImageService {
    */
   async getPrimaryProductImage(productId: number): Promise<string | null> {
     const result = await db
-      .select({ filename: uploadedImages.filename })
-      .from(uploadedImages)
+      .select({ filename: uploaded_images.filename })
+      .from(uploaded_images)
       .where(
         and(
-          eq(uploadedImages.product_id, productId),
-          eq(uploadedImages.is_primary, true)
+          eq(uploaded_images.product_id, productId),
+          eq(uploaded_images.is_primary, true)
         )
       )
       .limit(1);
@@ -177,17 +178,17 @@ export class ImageService {
   /**
    * Получает список всех изображений
    */
-  async getAllImages(): Promise<Array<{ filename: string; originalFilename: string; mimeType: string; fileSize: number; productId: number | null; createdAt: Date }>> {
+  async getAllImages(): Promise<Array<{ filename: string; originalFilename: string | null; mimeType: string | null; fileSize: number| null; productId: number | null; createdAt: Date | null }>> {
     const result = await db
       .select({
-        filename: uploadedImages.filename,
-        originalFilename: uploadedImages.original_filename,
-        mimeType: uploadedImages.mime_type,
-        fileSize: uploadedImages.file_size,
-        productId: uploadedImages.product_id,
-        createdAt: uploadedImages.created_at,
+        filename: uploaded_images.filename,
+        originalFilename: uploaded_images.original_filename,
+        mimeType: uploaded_images.mime_type,
+        fileSize: uploaded_images.file_size,
+        productId: uploaded_images.product_id,
+        createdAt: uploaded_images.created_at,
       })
-      .from(uploadedImages);
+      .from(uploaded_images);
 
     return result;
   }
@@ -203,7 +204,7 @@ export class ImageService {
       // Получаем все записи из БД
       const dbImages = await db
         .select()
-        .from(uploadedImages);
+        .from(uploaded_images);
 
       for (const dbImage of dbImages) {
         const filePath = path.join(this.imagesDir, dbImage.filename);
@@ -211,8 +212,8 @@ export class ImageService {
         // Если файл не существует в файловой системе, удаляем запись из БД
         if (!fs.existsSync(filePath)) {
           await db
-            .delete(uploadedImages)
-            .where(eq(uploadedImages.filename, dbImage.filename));
+            .delete(uploaded_images)
+            .where(eq(uploaded_images.filename, dbImage.filename));
           errors.push(`Удалена запись для отсутствующего файла: ${dbImage.filename}`);
         } else {
           synced++;
@@ -229,8 +230,8 @@ export class ImageService {
         for (const file of imageFiles) {
           const existing = await db
             .select()
-            .from(uploadedImages)
-            .where(eq(uploadedImages.filename, file))
+            .from(uploaded_images)
+            .where(eq(uploaded_images.filename, file))
             .limit(1);
 
           if (existing.length === 0) {
@@ -245,7 +246,7 @@ export class ImageService {
             if (ext === '.svg') mimeType = 'image/svg+xml';
             if (ext === '.webp') mimeType = 'image/webp';
 
-            await db.insert(uploadedImages).values({
+            await db.insert(uploaded_images).values({
               filename: file,
               original_filename: file,
               mime_type: mimeType,

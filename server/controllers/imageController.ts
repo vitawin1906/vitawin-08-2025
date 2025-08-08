@@ -1,6 +1,27 @@
 import { Request, Response } from "express";
 import { imageService } from "../services/imageService";
-import path from "path";
+import { z } from "zod";
+
+// Валидация для загрузки изображения
+const uploadImageSchema = z.object({
+  product_id: z.string().optional().transform(val => val ? parseInt(val) : undefined),
+  is_primary: z.string().optional().transform(val => val === 'true'),
+  display_order: z.string().optional().transform(val => val ? parseInt(val) : 0)
+});
+
+// Валидация ID продукта
+const productIdSchema = z.object({
+  productId: z.string().transform(val => {
+    const num = parseInt(val);
+    if (isNaN(num)) throw new Error("Invalid product ID");
+    return num;
+  })
+});
+
+// Валидация имени файла
+const filenameSchema = z.object({
+  filename: z.string().min(1)
+});
 
 export class ImageController {
   /**
@@ -12,15 +33,23 @@ export class ImageController {
         return res.status(400).json({ error: "Файл не предоставлен" });
       }
 
-      const { product_id, is_primary, display_order } = req.body;
+      const validationResult = uploadImageSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Некорректные параметры",
+          details: validationResult.error.errors
+        });
+      }
+
+      const { product_id, is_primary, display_order } = validationResult.data;
 
       const filename = await imageService.uploadImage(
-        req.file.buffer,
-        req.file.originalname,
-        req.file.mimetype,
-        product_id ? parseInt(product_id) : undefined,
-        is_primary === 'true',
-        display_order ? parseInt(display_order) : 0
+          req.file.buffer,
+          req.file.originalname,
+          req.file.mimetype,
+          product_id,
+          is_primary || false,
+          display_order || 0
       );
 
       res.json({
@@ -28,7 +57,7 @@ export class ImageController {
         filename,
         url: `/api/uploads/${filename}`,
         imageUrl: `/api/uploads/${filename}`,
-        product_id: product_id ? parseInt(product_id) : null
+        product_id: product_id || null
       });
     } catch (error) {
       console.error("Ошибка загрузки изображения:", error);
@@ -41,7 +70,15 @@ export class ImageController {
    */
   async getImage(req: Request, res: Response) {
     try {
-      const { filename } = req.params;
+      const validationResult = filenameSchema.safeParse(req.params);
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Некорректное имя файла",
+          details: validationResult.error.errors
+        });
+      }
+
+      const { filename } = validationResult.data;
       const image = await imageService.getImage(filename);
 
       if (!image) {
@@ -51,6 +88,7 @@ export class ImageController {
       res.set({
         'Content-Type': image.mimeType,
         'Cache-Control': 'public, max-age=31536000', // Кэш на год
+        'Content-Length': image.buffer.length.toString()
       });
 
       res.send(image.buffer);
@@ -65,7 +103,15 @@ export class ImageController {
    */
   async deleteImage(req: Request, res: Response) {
     try {
-      const { filename } = req.params;
+      const validationResult = filenameSchema.safeParse(req.params);
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Некорректное имя файла",
+          details: validationResult.error.errors
+        });
+      }
+
+      const { filename } = validationResult.data;
       const deleted = await imageService.deleteImage(filename);
 
       if (!deleted) {
@@ -84,12 +130,17 @@ export class ImageController {
    */
   async getProductImages(req: Request, res: Response) {
     try {
-      const productId = parseInt(req.params.productId);
-      if (isNaN(productId)) {
-        return res.status(400).json({ error: "Некорректный ID товара" });
+      const validationResult = productIdSchema.safeParse(req.params);
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Некорректный ID товара",
+          details: validationResult.error.errors
+        });
       }
 
+      const { productId } = validationResult.data;
       const images = await imageService.getProductImages(productId);
+
       res.json({
         success: true,
         images: images.map(img => ({
@@ -110,12 +161,17 @@ export class ImageController {
    */
   async getPrimaryProductImage(req: Request, res: Response) {
     try {
-      const productId = parseInt(req.params.productId);
-      if (isNaN(productId)) {
-        return res.status(400).json({ error: "Некорректный ID товара" });
+      const validationResult = productIdSchema.safeParse(req.params);
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Некорректный ID товара",
+          details: validationResult.error.errors
+        });
       }
 
+      const { productId } = validationResult.data;
       const filename = await imageService.getPrimaryProductImage(productId);
+
       if (!filename) {
         return res.status(404).json({ error: "Основное изображение не найдено" });
       }
@@ -145,22 +201,21 @@ export class ImageController {
   }
 
   /**
-   * Миграция изображений из файловой системы в базу данных
+   * Синхронизация изображений между файловой системой и БД
    */
-  async migrateImages(req: Request, res: Response) {
+  async syncImages(req: Request, res: Response) {
     try {
-      const uploadsDir = path.join(process.cwd(), "server/uploads");
-      const result = await imageService.migrateFromFileSystem(uploadsDir);
+      const result = await imageService.syncWithFileSystem();
 
       res.json({
         success: true,
-        migrated: result.migrated,
+        synced: result.synced,
         errors: result.errors,
-        message: `Мигрировано ${result.migrated} изображений${result.errors.length > 0 ? `, ошибок: ${result.errors.length}` : ''}`
+        message: `Синхронизировано ${result.synced} изображений${result.errors.length > 0 ? `, ошибок: ${result.errors.length}` : ''}`
       });
     } catch (error) {
-      console.error("Ошибка миграции изображений:", error);
-      res.status(500).json({ error: "Ошибка миграции изображений" });
+      console.error("Ошибка синхронизации изображений:", error);
+      res.status(500).json({ error: "Ошибка синхронизации изображений" });
     }
   }
 }
