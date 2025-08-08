@@ -34,7 +34,10 @@ export const product_images = pgTable("product_images", {
     url: text("url").notNull(),
     alt_text: text("alt_text"),
     webp_url: text("webp_url"),
-    thumbnail_url: text("thumbnail_url")
+    thumbnail_url: text("thumbnail_url"),
+    is_primary: boolean("is_primary").default(false),
+    cloudinary_public_id: text("cloudinary_public_id"),
+
 });
 
 // === Categories ===

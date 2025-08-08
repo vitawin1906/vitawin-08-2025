@@ -113,23 +113,56 @@ export async function deleteProduct(id: number): Promise<boolean> {
 
 // =================== PRODUCT IMAGES (GALLERY) ===================
 
-// Получить галерею для товара
+/// Получить галерею для товара
 export async function getProductImages(productId: number): Promise<ProductImage[]> {
     return db.select().from(product_images).where(eq(product_images.product_id, productId));
 }
 
-// Добавить картинку к товару
-export async function addProductImage(productId: number, image: ProductImageInsert): Promise<ProductImage> {
+// Добавить картинку к товару (если is_primary = true — сбрасываем primary у других!)
+export async function addProductImage(
+    productId: number,
+    image: Omit<ProductImageInsert, "product_id">
+): Promise<ProductImage> {
+    if (image.is_primary) {
+        await db.update(product_images)
+            .set({ is_primary: false })
+            .where(eq(product_images.product_id, productId));
+    }
     const [created] = await db.insert(product_images).values({ ...image, product_id: productId }).returning();
     return created;
 }
 
-// Удалить картинку товара
+
+// Удалить картинку по id
 export async function deleteProductImage(imageId: number): Promise<boolean> {
     const [deleted] = await db.delete(product_images).where(eq(product_images.id, imageId)).returning();
     return !!deleted;
 }
 
+export async function getPrimaryProductImage(productId: number): Promise<ProductImage | null> {
+    let res = await db
+        .select()
+        .from(product_images)
+        .where(and(
+            eq(product_images.product_id, productId),
+            eq(product_images.is_primary, true)
+        ))
+        .limit(1);
+
+    if (res.length > 0) return res[0];
+
+    // Fallback: вернуть первую картинку по display_order
+    res = await db
+        .select()
+        .from(product_images)
+        .where(eq(product_images.product_id, productId))
+        .limit(1);
+    return res[0] ?? null;
+}
+export async function getProductImageById(imageId: number): Promise<ProductImage | null> {
+    const res = await db.select().from(product_images).where(eq(product_images.id, imageId));
+    return res[0] ?? null;
+}
 // =================== PRODUCT CATEGORIES (MANY-TO-MANY) ===================
 
 // Получить все категории для товара

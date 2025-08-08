@@ -1,81 +1,68 @@
-import { Request, Response } from 'express';
-import { imageService } from '../services/imageService';
+import { Request, Response } from "express";
+import * as uploadedImagesStorage from "../storage/uploadedImagesStorage";
+import { z } from "zod";
 
-interface MulterRequest extends Request {
-  file?: Express.Multer.File;
-}
+const uploadSchema = z.object({
+  alt_text: z.string().optional(),
+});
 
-class UploadController {
-  async uploadImage(req: MulterRequest, res: Response) {
-    console.log('Upload request received, file size:', req.file?.size || 'no file');
-    
+const imageIdSchema = z.object({ id: z.coerce.number() });
+
+export class UploadedImagesController {
+  async uploadImage(req: Request, res: Response) {
     try {
-      if (!req.file) {
-        console.log('Upload error: No file uploaded');
-        return res.status(400).json({ error: 'No file uploaded' });
+      if (!req.file || !(req.file as any).path || !(req.file as any).filename) {
+        return res.status(400).json({ error: "Файл не загружен" });
       }
+      const valid = uploadSchema.safeParse(req.body);
+      if (!valid.success) return res.status(400).json({ error: "Некорректные параметры", details: valid.error.errors });
 
-      const file = req.file;
-      console.log(`Uploading file: ${file.originalname}, size: ${file.size} bytes, type: ${file.mimetype}`);
-      
-      // Проверяем размер файла
-      if (file.size > 10 * 1024 * 1024) {
-        console.log('Upload error: File too large');
-        return res.status(413).json({ error: 'File too large. Maximum size is 10MB' });
-      }
-      
-      // Используем imageService для сохранения файла на диск
-      const fileName = await imageService.uploadImage(
-        file.buffer,
-        file.originalname,
-        file.mimetype
-      );
+      const { path: url, filename: cloudinary_public_id } = req.file as any;
+      const { alt_text } = valid.data;
 
-      console.log(`File uploaded successfully: ${fileName}`);
-
-      // Возвращаем URL для API endpoint
-      const publicUrl = `/api/uploads/${fileName}`;
-
-      res.json({
-        success: true,
-        imageUrl: publicUrl,
-        url: publicUrl,
-        path: fileName,
-        filename: fileName
+      const image = await uploadedImagesStorage.addUploadedImage({
+        url,
+        alt_text,
+        cloudinary_public_id,
       });
+
+      res.json({ success: true, image });
     } catch (error) {
-      console.error('Upload error:', error);
-      if (error.message?.includes('timeout')) {
-        res.status(408).json({ error: 'Upload timeout. Please try again with a smaller file.' });
-      } else if (error.message?.includes('ENOSPC')) {
-        res.status(507).json({ error: 'Insufficient storage space' });
-      } else {
-        res.status(500).json({ error: 'Server error during upload' });
-      }
+      res.status(500).json({ error: "Ошибка загрузки изображения" });
     }
   }
 
   async deleteImage(req: Request, res: Response) {
     try {
-      const { path } = req.body;
+      const valid = imageIdSchema.safeParse(req.params);
+      if (!valid.success) return res.status(400).json({ error: "Некорректный ID" });
 
-      if (!path) {
-        return res.status(400).json({ error: 'Image path is required' });
+      // Получаем инфо об изображении
+      const image = await uploadedImagesStorage.getUploadedImageById(valid.data.id);
+      if (!image) return res.status(404).json({ error: "Изображение не найдено" });
+
+      // Удаляем из Cloudinary (если public_id есть)
+      if (image.cloudinary_public_id) {
+        const { cloudinary } = await import("../config/cloudinary");
+        await cloudinary.uploader.destroy(image.cloudinary_public_id);
       }
 
-      // Используем imageService для удаления
-      const success = await imageService.deleteImage(path);
-
-      if (success) {
-        res.json({ success: true });
-      } else {
-        res.status(404).json({ error: 'Image not found or could not be deleted' });
-      }
+      const deleted = await uploadedImagesStorage.deleteUploadedImage(valid.data.id);
+      if (!deleted) return res.status(404).json({ error: "Изображение не найдено" });
+      res.json({ success: true });
     } catch (error) {
-      console.error('Delete error:', error);
-      res.status(500).json({ error: 'Server error during deletion' });
+      res.status(500).json({ error: "Ошибка удаления изображения" });
+    }
+  }
+
+  async getAllImages(req: Request, res: Response) {
+    try {
+      const images = await uploadedImagesStorage.getAllUploadedImages();
+      res.json({ success: true, images });
+    } catch (error) {
+      res.status(500).json({ error: "Ошибка получения изображений" });
     }
   }
 }
 
-export const uploadController = new UploadController();
+export const uploadedImagesController = new UploadedImagesController();

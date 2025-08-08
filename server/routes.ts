@@ -82,42 +82,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Простой роут для прямого доступа к изображениям (без кодирования)
-  app.get("/uploads/:filename", async (req, res) => {
-    try {
-      const filename = req.params.filename;
-      console.log(`[DIRECT IMG] Request for: ${filename}`);
-
-      // Простая проверка расширения
-      if (!filename.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$/i)) {
-        return res.status(400).json({ error: 'Invalid file type' });
-      }
-
-      // Прямое чтение файла без декодирования
-      const filePath = path.join(process.cwd(), 'uploads', filename);
-
-      if (require('fs').existsSync(filePath)) {
-        const buffer = await require('fs').promises.readFile(filePath);
-        const ext = filename.split('.').pop()?.toLowerCase() || '';
-        const mimeTypes: { [key: string]: string } = {
-          'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png',
-          'gif': 'image/gif', 'webp': 'image/webp', 'svg': 'image/svg+xml',
-          'bmp': 'image/bmp', 'tiff': 'image/tiff'
-        };
-
-        res.setHeader('Content-Type', mimeTypes[ext] || 'image/jpeg');
-        res.setHeader('Cache-Control', 'public, max-age=86400');
-        res.setHeader('Content-Length', buffer.length);
-        console.log(`[DIRECT IMG] Served: ${filename}, size: ${buffer.length} bytes`);
-        return res.send(buffer);
-      }
-
-      console.log(`[DIRECT IMG] File not found: ${filename}`);
-      return res.status(404).json({ error: 'Image not found' });
-    } catch (error) {
-      console.error(`[DIRECT IMG] Error serving ${req.params.filename}:`, error);
-      return res.status(500).json({ error: 'Server error' });
-    }
-  });
+  // app.get("/uploads/:filename", async (req, res) => {
+  //   try {
+  //     const filename = req.params.filename;
+  //     console.log(`[DIRECT IMG] Request for: ${filename}`);
+  //
+  //     // Простая проверка расширения
+  //     if (!filename.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$/i)) {
+  //       return res.status(400).json({ error: 'Invalid file type' });
+  //     }
+  //
+  //     // Прямое чтение файла без декодирования
+  //     const filePath = path.join(process.cwd(), 'uploads', filename);
+  //
+  //     if (require('fs').existsSync(filePath)) {
+  //       const buffer = await require('fs').promises.readFile(filePath);
+  //       const ext = filename.split('.').pop()?.toLowerCase() || '';
+  //       const mimeTypes: { [key: string]: string } = {
+  //         'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png',
+  //         'gif': 'image/gif', 'webp': 'image/webp', 'svg': 'image/svg+xml',
+  //         'bmp': 'image/bmp', 'tiff': 'image/tiff'
+  //       };
+  //
+  //       res.setHeader('Content-Type', mimeTypes[ext] || 'image/jpeg');
+  //       res.setHeader('Cache-Control', 'public, max-age=86400');
+  //       res.setHeader('Content-Length', buffer.length);
+  //       console.log(`[DIRECT IMG] Served: ${filename}, size: ${buffer.length} bytes`);
+  //       return res.send(buffer);
+  //     }
+  //
+  //     console.log(`[DIRECT IMG] File not found: ${filename}`);
+  //     return res.status(404).json({ error: 'Image not found' });
+  //   } catch (error) {
+  //     console.error(`[DIRECT IMG] Error serving ${req.params.filename}:`, error);
+  //     return res.status(500).json({ error: 'Server error' });
+  //   }
+  // });
 
   // Health check endpoint for Docker
   app.get('/health', (req, res) => {
@@ -130,135 +130,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Configure multer for file uploads
-  const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: {
-      fileSize: 10 * 1024 * 1024, // Увеличил до 10MB для больших изображений
-      fieldSize: 10 * 1024 * 1024,
-      files: 1
-    },
-    fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('Only image files are allowed'));
-      }
-    }
-  });
+  // // Configure multer for file uploads
+  // const upload = multer({
+  //   storage: multer.memoryStorage(),
+  //   limits: {
+  //     fileSize: 10 * 1024 * 1024, // Увеличил до 10MB для больших изображений
+  //     fieldSize: 10 * 1024 * 1024,
+  //     files: 1
+  //   },
+  //   fileFilter: (req, file, cb) => {
+  //     if (file.mimetype.startsWith('image/')) {
+  //       cb(null, true);
+  //     } else {
+  //       cb(new Error('Only image files are allowed'));
+  //     }
+  //   }
+  // });
 
-  // Upload routes with security enforcement
-  app.post("/api/upload/image", (req, res, next) => {
-    // Увеличиваем timeout для загрузки файлов
-    req.setTimeout(60000); // 60 секунд
-    res.setTimeout(60000);
-    next();
-  }, upload.single('image'), fileUploadSecurity, uploadController.uploadImage);
-  app.delete("/api/upload/image", adminAuthMiddleware, uploadController.deleteImage);
-
-  // API endpoint для раздачи изображений из файловой системы (обходит проблему с Vite dev server)
-  app.get('/api/uploads/:filename', async (req, res) => {
-    try {
-      let filename = req.params.filename;
-      console.log(`[IMAGE] Raw filename from URL: ${filename}`);
-
-      // Декодируем URL-кодированные символы
-      try {
-        filename = decodeURIComponent(filename);
-        console.log(`[IMAGE] Decoded filename: ${filename}`);
-      } catch (e) {
-        console.log(`[IMAGE] Failed to decode filename: ${filename}`);
-      }
-
-      // Валидация имени файла
-      if (!filename || !/^[a-zA-Z0-9._%-]+\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$/i.test(filename)) {
-        console.log(`[IMAGE] Invalid filename format: ${filename}`);
-        return res.status(400).json({ error: 'Invalid filename' });
-      }
-
-      // Используем новый imageService для получения изображения
-      console.log(`[IMAGE] Requesting image: ${filename}`);
-      let image = await imageService.getImage(filename);
-
-      if (!image) {
-        console.log(`[IMAGE] Fallback to direct file reading for: ${filename}`);
-        // Прямое чтение из файловой системы
-        const filePath = path.join(process.cwd(), 'uploads', filename);
-        if (require('fs').existsSync(filePath)) {
-          const buffer = await require('fs').promises.readFile(filePath);
-          const ext = require('path').extname(filename).toLowerCase();
-          const mimeTypes = {
-            '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
-            '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml'
-          };
-          const mimeType = mimeTypes[ext] || 'application/octet-stream';
-          image = { buffer, mimeType };
-          console.log(`[IMAGE] Direct read successful: ${filename}, size: ${buffer.length}`);
-        }
-      }
-
-      if (!image) {
-        console.log(`[IMAGE] Image not found: ${filename}`);
-        return res.status(404).json({ error: 'Image not found' });
-      }
-
-      res.setHeader('Content-Type', image.mimeType);
-      res.setHeader('Cache-Control', 'public, max-age=86400'); // Кэш на 24 часа
-      res.setHeader('Content-Length', image.buffer.length);
-
-      // Отправляем изображение
-      res.send(image.buffer);
-    } catch (error) {
-      console.error('Error serving image:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
-
-  // Image microservice routes - дополнительные маршруты для управления изображениями
-  app.get("/api/uploads/file/:filename", imageController.getImage);
-  app.get("/api/uploads/:filename", imageController.getImage); // Новый роут для поддержки /api/images/имя_файла.png
-  app.delete("/api/uploads/file/:filename", imageController.deleteImage);
-  app.get("/api/uploads", imageController.getAllImages);
-  app.post("/api/uploads/migrate-images", imageController.getImage);
-
-  // API endpoint для получения изображений по ID (для блога)
-  app.get('/api/uploads/:id', async (req, res) => {
-    try {
-      const imageId = parseInt(req.params.id);
-
-      if (isNaN(imageId)) {
-        return res.status(400).json({ error: 'Invalid image ID' });
-      }
-
-      // Ищем изображение в базе данных по ID
-      const dbImage = await db.select().from(uploaded_images).where(eq(uploaded_images.id, imageId)).limit(1);
-
-      if (dbImage.length === 0) {
-        return res.status(404).json({ error: 'Image not found' });
-      }
-
-      // Используем новый imageService для получения файла
-      const image = await imageService.getImage(dbImage[0].filename);
-
-      if (!image) {
-        return res.status(404).json({ error: 'Image file not found' });
-      }
-
-      res.setHeader('Content-Type', image.mimeType);
-      res.setHeader('Cache-Control', 'public, max-age=86400'); // Кэш на 24 часа
-      res.setHeader('Content-Length', image.buffer.length);
-
-      // Отправляем изображение
-      res.send(image.buffer);
-    } catch (error) {
-      console.error('Error serving image by ID:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
-
-  // Product-specific image routes - жесткая связь товар-изображение
-  app.get("/api/products/:productId/images", imageController.getProductImages);
-  app.get("/api/products/:productId/primary-image", imageController.getPrimaryProductImage);
+  // // Upload routes with security enforcement
+  // app.post("/api/upload/image", (req, res, next) => {
+  //   // Увеличиваем timeout для загрузки файлов
+  //   req.setTimeout(60000); // 60 секунд
+  //   res.setTimeout(60000);
+  //   next();
+  // }, upload.single('image'), fileUploadSecurity, uploadController.uploadImage);
+  // app.delete("/api/upload/image", adminAuthMiddleware, uploadController.deleteImage);
+  //
+  // // API endpoint для раздачи изображений из файловой системы (обходит проблему с Vite dev server)
+  // app.get('/api/uploads/:filename', async (req, res) => {
+  //   try {
+  //     let filename = req.params.filename;
+  //     console.log(`[IMAGE] Raw filename from URL: ${filename}`);
+  //
+  //     // Декодируем URL-кодированные символы
+  //     try {
+  //       filename = decodeURIComponent(filename);
+  //       console.log(`[IMAGE] Decoded filename: ${filename}`);
+  //     } catch (e) {
+  //       console.log(`[IMAGE] Failed to decode filename: ${filename}`);
+  //     }
+  //
+  //     // Валидация имени файла
+  //     if (!filename || !/^[a-zA-Z0-9._%-]+\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff)$/i.test(filename)) {
+  //       console.log(`[IMAGE] Invalid filename format: ${filename}`);
+  //       return res.status(400).json({ error: 'Invalid filename' });
+  //     }
+  //
+  //     // Используем новый imageService для получения изображения
+  //     console.log(`[IMAGE] Requesting image: ${filename}`);
+  //     let image = await imageService.getImage(filename);
+  //
+  //     if (!image) {
+  //       console.log(`[IMAGE] Fallback to direct file reading for: ${filename}`);
+  //       // Прямое чтение из файловой системы
+  //       const filePath = path.join(process.cwd(), 'uploads', filename);
+  //       if (require('fs').existsSync(filePath)) {
+  //         const buffer = await require('fs').promises.readFile(filePath);
+  //         const ext = require('path').extname(filename).toLowerCase();
+  //         const mimeTypes = {
+  //           '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+  //           '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml'
+  //         };
+  //         const mimeType = mimeTypes[ext] || 'application/octet-stream';
+  //         image = { buffer, mimeType };
+  //         console.log(`[IMAGE] Direct read successful: ${filename}, size: ${buffer.length}`);
+  //       }
+  //     }
+  //
+  //     if (!image) {
+  //       console.log(`[IMAGE] Image not found: ${filename}`);
+  //       return res.status(404).json({ error: 'Image not found' });
+  //     }
+  //
+  //     res.setHeader('Content-Type', image.mimeType);
+  //     res.setHeader('Cache-Control', 'public, max-age=86400'); // Кэш на 24 часа
+  //     res.setHeader('Content-Length', image.buffer.length);
+  //
+  //     // Отправляем изображение
+  //     res.send(image.buffer);
+  //   } catch (error) {
+  //     console.error('Error serving image:', error);
+  //     res.status(500).json({ error: 'Internal server error' });
+  //   }
+  // });
+  //
+  // // Image microservice routes - дополнительные маршруты для управления изображениями
+  // app.get("/api/uploads/file/:filename", imageController.getImage);
+  // app.get("/api/uploads/:filename", imageController.getImage); // Новый роут для поддержки /api/images/имя_файла.png
+  // app.delete("/api/uploads/file/:filename", imageController.deleteImage);
+  // app.get("/api/uploads", imageController.getAllImages);
+  // app.post("/api/uploads/migrate-images", imageController.getImage);
+  //
+  // // API endpoint для получения изображений по ID (для блога)
+  // app.get('/api/uploads/:id', async (req, res) => {
+  //   try {
+  //     const imageId = parseInt(req.params.id);
+  //
+  //     if (isNaN(imageId)) {
+  //       return res.status(400).json({ error: 'Invalid image ID' });
+  //     }
+  //
+  //     // Ищем изображение в базе данных по ID
+  //     const dbImage = await db.select().from(uploaded_images).where(eq(uploaded_images.id, imageId)).limit(1);
+  //
+  //     if (dbImage.length === 0) {
+  //       return res.status(404).json({ error: 'Image not found' });
+  //     }
+  //
+  //     // Используем новый imageService для получения файла
+  //     const image = await imageService.getImage(dbImage[0].filename);
+  //
+  //     if (!image) {
+  //       return res.status(404).json({ error: 'Image file not found' });
+  //     }
+  //
+  //     res.setHeader('Content-Type', image.mimeType);
+  //     res.setHeader('Cache-Control', 'public, max-age=86400'); // Кэш на 24 часа
+  //     res.setHeader('Content-Length', image.buffer.length);
+  //
+  //     // Отправляем изображение
+  //     res.send(image.buffer);
+  //   } catch (error) {
+  //     console.error('Error serving image by ID:', error);
+  //     res.status(500).json({ error: 'Internal server error' });
+  //   }
+  // });
+  //
+  // // Product-specific image routes - жесткая связь товар-изображение
+  // app.get("/api/products/:productId/images", imageController.getProductImages);
+  // app.get("/api/products/:productId/primary-image", imageController.getPrimaryProductImage);
 
   // // Authentication routes
   // app.post("/api/auth/telegram", authController.telegramAuth);
@@ -356,63 +356,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/profile", adminAuthMiddleware, adminSecurityEnforcement, enhancedAdminProtection, adminRateLimit, getAdminProfile);
   app.post("/api/admin/change-password", adminAuthMiddleware, adminSecurityEnforcement, enhancedAdminProtection, adminRateLimit, xssProtection, changePassword);
 // changePassword
-  // Product routes with caching and rate limiting
-  app.get("/api/products", createRateLimit(200, 60000), async (req, res, next) => {
-    try {
-      // Проверяем кэш
-      const cached = cacheService.getProductList();
-      if (cached) {
-        return res.json(cached);
-      }
-
-      // Если нет в кэше, вызываем контроллер
-      next();
-    } catch (error) {
-      errorMonitoringService.logError('error', 'Products cache middleware error', error as Error);
-      next();
-    }
-  }, productController.getProducts);
-
-  // Random products endpoint for homepage
-  app.get("/api/products/random", createRateLimit(200, 60000), productController.getProductsByCategory());
-
-  // 301 редиректы для старых цифровых URL
-  app.get("/product/7", (req, res) => {
-    res.redirect(301, "/product/ezhovik-grebenchatiy");
-  });
-
-  app.get("/product/8", (req, res) => {
-    res.redirect(301, "/404");
-  });
-
-  app.get("/product/9", (req, res) => {
-    res.redirect(301, "/product/vitamin-d3");
-  });
-
-  app.get("/product/10", (req, res) => {
-    res.redirect(301, "/product/omega-3");
-  });
-
-  app.get("/product/11", (req, res) => {
-    res.redirect(301, "/product/ezhovik-grebenchatiy-extract");
-  });
-
-  app.get("/product/12", (req, res) => {
-    res.redirect(301, "/404");
-  });
-
-  app.get("/product/13", (req, res) => {
-    res.redirect(301, "/product/berberine");
-  });
-
-  // Удаляем указанные страницы
-  app.get("/product/berberin", (req, res) => {
-    res.redirect(301, "/404");
-  });
-
-  app.get("/product/test", (req, res) => {
-    res.redirect(301, "/404");
-  });
+//   // Product routes with caching and rate limiting
+//   app.get("/api/products", createRateLimit(200, 60000), async (req, res, next) => {
+//     try {
+//       // Проверяем кэш
+//       const cached = cacheService.getProductList();
+//       if (cached) {
+//         return res.json(cached);
+//       }
+//
+//       // Если нет в кэше, вызываем контроллер
+//       next();
+//     } catch (error) {
+//       errorMonitoringService.logError('error', 'Products cache middleware error', error as Error);
+//       next();
+//     }
+//   }, productController.getProducts);
+//
+//   // Random products endpoint for homepage
+//   app.get("/api/products/random", createRateLimit(200, 60000), productController.getProductsByCategory());
+//
+//   // 301 редиректы для старых цифровых URL
+//   app.get("/product/7", (req, res) => {
+//     res.redirect(301, "/product/ezhovik-grebenchatiy");
+//   });
+//
+//   app.get("/product/8", (req, res) => {
+//     res.redirect(301, "/404");
+//   });
+//
+//   app.get("/product/9", (req, res) => {
+//     res.redirect(301, "/product/vitamin-d3");
+//   });
+//
+//   app.get("/product/10", (req, res) => {
+//     res.redirect(301, "/product/omega-3");
+//   });
+//
+//   app.get("/product/11", (req, res) => {
+//     res.redirect(301, "/product/ezhovik-grebenchatiy-extract");
+//   });
+//
+//   app.get("/product/12", (req, res) => {
+//     res.redirect(301, "/404");
+//   });
+//
+//   app.get("/product/13", (req, res) => {
+//     res.redirect(301, "/product/berberine");
+//   });
+//
+//   // Удаляем указанные страницы
+//   app.get("/product/berberin", (req, res) => {
+//     res.redirect(301, "/404");
+//   });
+//
+//   app.get("/product/test", (req, res) => {
+//     res.redirect(301, "/404");
+//   });
 
   // Обработка 404 страницы с правильным статусом
   app.get("/404", (req, res) => {
@@ -420,23 +420,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Пропускаем обработку к Vite для рендера React компонента
     res.locals.status = 404;
   });
-
-  app.get("/api/product/:id", createRateLimit(300, 60000), async (req, res, next) => {
-    try {
-      const productId = parseInt(req.params.id);
-      const cached = cacheService.getProduct(productId);
-      if (cached) {
-        return res.json(cached);
-      }
-
-      next();
-    } catch (error) {
-      errorMonitoringService.logError('error', 'Product cache middleware error', error as Error);
-      next();
-    }
-  }, productController.getProduct);
-
-  app.get("/api/product/slug/:slug", createRateLimit(300, 60000), productController.getProductBySlug);
+  //
+  // app.get("/api/product/:id", createRateLimit(300, 60000), async (req, res, next) => {
+  //   try {
+  //     const productId = parseInt(req.params.id);
+  //     const cached = cacheService.getProduct(productId);
+  //     if (cached) {
+  //       return res.json(cached);
+  //     }
+  //
+  //     next();
+  //   } catch (error) {
+  //     errorMonitoringService.logError('error', 'Product cache middleware error', error as Error);
+  //     next();
+  //   }
+  // }, productController.getProduct);
+  //
+  // app.get("/api/product/slug/:slug", createRateLimit(300, 60000), productController.getProductBySlug);
 
   // // Cart routes (with optional auth)
   // app.post("/api/cart", optionalAuthMiddleware, cartController.updateCart);
