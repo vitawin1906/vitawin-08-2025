@@ -1,92 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <meta name="yandex-verification" content="86c923468bce03a6" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VitaWin - Здоровье и красота</title>
+    <meta name="description" content="VitaWin - премиум продукты для здоровья и красоты с MLM системой. Присоединяйтесь к нашей партнерской программе и зарабатывайте." />
     
-    <!-- Preload critical resources -->
-    <link rel="preload" href="/vitawin-logo.png" as="image" type="image/png">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://vitawins.ru/" />
+    <meta property="og:title" content="VitaWin - Здоровье и красота" />
+    <meta property="og:description" content="Премиум продукты для здоровья и красоты с MLM системой. Присоединяйтесь к нашей партнерской программе." />
+    <meta property="og:image" content="/og-image.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://vitawins.ru/" />
+    <meta property="twitter:title" content="VitaWin - Здоровье и красота" />
+    <meta property="twitter:description" content="Премиум продукты для здоровья и красоты с MLM системой." />
+    <meta property="twitter:image" content="/og-image.jpg" />
+    
+    <!-- Telegram Web App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="//api.telegram.org">
-    
-    <!-- Base SEO meta tags -->
-    <title>VitaWin — Премиальные витамины, БАД и пищевые добавки | MLM компания 3.0</title>
-    <meta name="description" content="VitaWin — ведущая MLM компания в сфере здоровья. Премиальные витамины, БАД и пищевые добавки с научным подходом. Партнерская программа от 20%. Качественные биодобавки для вашего здоровья и долголетия." />
-    <meta name="keywords" content="vitawin, витамины, БАД, пищевые добавки, млм компания, партнерская программа, здоровье, биодобавки, витамины купить, добавки для здоровья, натуральные витамины, качественные БАД, здоровое питание, витамины и минералы, иммунитет, долголетие" />
-    <meta name="author" content="VitaWin" />
-    <meta name="robots" content="index, follow" />
-    <meta name="language" content="ru" />
-    <meta name="geo.region" content="RU" />
-    <meta name="geo.placename" content="Россия" />
-    
-    <!-- Open Graph meta tags -->
-    <meta property="og:title" content="VitaWin — Премиальные витамины и БАД | MLM компания" />
-    <meta property="og:description" content="Присоединяйтесь к VitaWin — инновационной MLM компании в сфере здоровья. Качественные витамины и БАД с научным подходом. Партнерская программа до 20%." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://vitawin.replit.app" />
-    <meta property="og:site_name" content="VitaWin" />
-    <meta property="og:locale" content="ru_RU" />
-    <meta property="og:image" content="https://vitawin.replit.app/vitawin-logo.png" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:image:alt" content="VitaWin - Премиальные витамины и БАД" />
-    <meta property="og:image:type" content="image/png" />
-    
-    <!-- Twitter Card meta tags -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="VitaWin — Премиальные витамины и БАД" />
-    <meta name="twitter:description" content="Качественные витамины и БАД с научным подходом. Партнерская программа до 20%." />
-    <meta name="twitter:image" content="https://vitawin.replit.app/vitawin-logo.png" />
-    <meta name="twitter:image:alt" content="VitaWin - Премиальные витамины и БАД" />
-
-    <!-- Additional SEO meta tags управляются динамически через SEOHead компонент -->
-
-    <!-- Favicon and Manifest -->
-    <link rel="icon" href="/favicon.png" type="image/png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
-    <link rel="manifest" href="/manifest.json" />
-
-    <!-- Telegram WebApp SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <meta name="google-site-verification" content="UDjSxF5ZQGbfw3cN7uCnzzoS3Kw1kJJAemX1_Xrya9k" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z9P0G6135X"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-Z9P0G6135X');
-    </script>
   </head>
   <body>
     <div id="root"></div>
-
-    <script type="module" src="/src/main.tsx"></script>
-
-
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript" >
-       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-       m[i].l=1*new Date();
-       for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-       (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-
-       ym(102293961, "init", {
-            clickmap:true,
-            trackLinks:true,
-            accurateTrackBounce:true,
-            webvisor:true,
-            trackHash:true,
-            ecommerce:"dataLayer"
-       });
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/102293961" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
+    <script type="module" src="/client/src/main.tsx"></script>
   </body>
 </html>

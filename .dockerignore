@@ -34,3 +34,8 @@ backup*/
 # Логи
 logs/
 *.log
+npm-debug.log
+.gitignore
+.env
+uploads
+logs
