@@ -1,26 +1,13 @@
 import React from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Router, Route, Switch } from "wouter";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { MessageProvider } from "@/contexts/MessageContext";
-import { queryClient } from "@/lib/queryClient";
-import { useAuthSync } from "@/hooks/useAuthSync";
-import TelegramAutoAuth from "@/components/TelegramAutoAuth";
-import CustomScripts from "@/components/CustomScripts";
-import ScrollToTop from "@/components/ScrollToTop";
-import AuthSuccessNotification from "@/components/AuthSuccessNotification";
-import { PerformanceMonitor, preloadCriticalResources } from "@/utils/performanceUtils";
+
 import Index from "./pages/Index";
 import Store from "./pages/Store";
 import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
+
 import Contact from "./pages/Contact";
 
 import Account from "./pages/Account";
-
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
 import Checkout from "./pages/Checkout";
@@ -37,10 +24,26 @@ import MessageDemo from "./pages/MessageDemo";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ContractOffer from "./pages/ContractOffer";
 import TermsOfService from "./pages/TermsOfService";
-import CookiePolicy from "./pages/CookiePolicy";
 
+import CookiePolicy from "./pages/CookiePolicy";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import {PerformanceMonitor, preloadCriticalResources} from "./utils/performanceUtils";
+import {useAuthSync} from "./hooks/useAuthSync";
+import CustomScripts from "./components/CustomScripts";
+import TelegramAutoAuth from "./components/TelegramAutoAuth";
+import ScrollToTop from "./components/ScrollToTop";
+import AuthSuccessNotification from "./components/AuthSuccessNotification";
+import {Switch} from "./components/ui/switch";
+import {LanguageProvider} from "./contexts/LanguageContext";
+import {MessageProvider} from "./contexts/MessageContext";
+import {queryClient} from "./lib/queryClient";
+import {TooltipProvider} from "./components/ui/tooltip";
+import {Toaster} from "./components/ui/sonner";
+
+function Route(props: { path: string, component: () => JSX.Element }) {
+  return null;
+}
 
 const AppContent = () => {
   useAuthSync(); // Включаем синхронизацию авторизации между вкладками
@@ -91,6 +94,18 @@ const AppContent = () => {
     </>
   );
 };
+
+function QueryClientProvider(props: { client: any, children: ReactNode }) {
+  return null;
+}
+
+function Sonner() {
+  return null;
+}
+
+function Router(props: { children: ReactNode }) {
+  return null;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

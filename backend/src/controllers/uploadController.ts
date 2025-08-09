@@ -43,7 +43,7 @@ export class UploadedImagesController {
 
       // Удаляем из Cloudinary (если public_id есть)
       if (image.cloudinary_public_id) {
-        const { cloudinary } = await import("../config/cloudinary");
+        const { cloudinary } = await import("../../config/cloudinary");
         await cloudinary.uploader.destroy(image.cloudinary_public_id);
       }
 

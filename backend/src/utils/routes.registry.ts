@@ -1,53 +1,14 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import cors from "cors";
-import { authController } from "./controllers/authController";
-import { productController } from "./controllers/productsController.ts";
-import { cartController } from "./controllers/cartController";
-import { orderController } from "./controllers/orderController";
-import { referralController } from "./controllers/referralController";
-import { blogController } from "./controllers/blogController";
-import { adminController } from "./controllers/adminController";
-import { uploadController } from "./controllers/uploadController";
-import { imageController } from "./controllers/imageController";
-import { aiControllerStub } from "./controllers/aiController";
-import { aboutPageController } from "./controllers/aboutPageController";
-import {
-  buildReferralNetwork,
-  calculateBonusesAPI,
-  getSystemHealthReport,
-  getErrorLogs
-} from "./controllers/advancedAIController";
-import { getMlmLevels, getMlmLevel, getUserMlmStatus, getUserMlmDetails, recalculateUserLevel } from "./controllers/mlmController";
-import { mlmNetworkController } from "./controllers/mlmNetworkController";
-import { MLMNetworkTreeRealController } from "./controllers/mlmNetworkTreeReal";
-import { userBonusPreferencesController } from "./controllers/userBonusPreferencesController";
-import { telegramController } from "./controllers/telegramController";
-import { supportBotController } from "./controllers/supportBotController";
-import { deliveryController } from "./controllers/deliveryController";
-import * as settingsController from "./controllers/settingsController";
-import { paymentController } from "./controllers/paymentController";
-import * as referralSettingsController from "./controllers/referralSettingsController";
-import { authMiddleware, adminMiddleware, optionalAuthMiddleware, optionalAdminOrUserAuthMiddleware } from "./middleware/auth";
-import { adminAuthMiddleware } from "./middleware/adminAuth";
-import { getCaptcha, adminLogin, adminLogout, getAdminProfile, changePassword } from "./controllers/adminAuthController";
-import { createRateLimit } from "./middleware/rateLimiter";
-import { adminRateLimit, loginRateLimit } from "./middleware/security";
-import { enhancedAdminProtection, sqlInjectionProtection, xssProtection } from "./middleware/adminProtection";
-import { adminSecurityEnforcement, fileUploadSecurity } from "./middleware/securityEnforcement";
-import { robotsMiddleware } from "./middleware/robotsMiddleware";
-import { cacheService } from "./services/cacheService";
-import { errorMonitoringService } from "./services/errorMonitoringService";
-import { addSimpleImageRoute } from "./imageRoute";
-import { performanceMonitor } from "./services/performanceMonitor";
-import { optimizedReferralService } from "./services/optimizedReferralService";
-import { memoryManager } from "./services/memoryManager";
-import { storage, db } from "./storage/storage";
-import { uploaded_images } from '@shared/schema';
-import { eq } from 'drizzle-orm';
-import multer from 'multer';
-import { imageService } from './services/imageService';
-import path  from "path";
+import {performanceMonitor} from "../services/performanceMonitor.js";
+import {robotsMiddleware} from "../middleware/robotsMiddleware.js";
+import path from "path";
+import {fileUploadSecurity} from "../middleware/securityEnforcement.js";
+import {adminAuthMiddleware} from "../middleware/adminAuth.js";
+import { imageService } from "../services/imageService.js";
+import {productImagesController} from "./../controllers/imageController.js";
+
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // CORS configuration
@@ -138,7 +99,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       fieldSize: 10 * 1024 * 1024,
       files: 1
     },
-    fileFilter: (req, file, cb) => {
+    fileFilter: (req: any, file: any, cb: any) => {
       if (file.mimetype.startsWith('image/')) {
         cb(null, true);
       } else {
@@ -153,8 +114,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     req.setTimeout(60000); // 60 секунд
     res.setTimeout(60000);
     next();
-  }, upload.single('image'), fileUploadSecurity, uploadController.uploadImage);
-  app.delete("/api/upload/image", adminAuthMiddleware, uploadController.deleteImage);
+  }, upload.single('image'), fileUploadSecurity, productImagesController.uploadImage);
+  app.delete("/api/upload/image", adminAuthMiddleware, productImagesController.deleteImage);
 
   // API endpoint для раздачи изображений из файловой системы (обходит проблему с Vite dev server)
   app.get('/api/uploads/:filename', async (req, res) => {
@@ -214,51 +175,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Image microservice routes - дополнительные маршруты для управления изображениями
-  app.get("/api/uploads/file/:filename", imageController.getImage);
-  app.get("/api/uploads/:filename", imageController.getImage); // Новый роут для поддержки /api/images/имя_файла.png
-  app.delete("/api/uploads/file/:filename", imageController.deleteImage);
-  app.get("/api/uploads", imageController.getAllImages);
-  app.post("/api/uploads/migrate-images", imageController.getImage);
+  // // Image microservice routes - дополнительные маршруты для управления изображениями
+  // app.get("/api/uploads/file/:filename", productImagesController.getImage);
+  // app.get("/api/uploads/:filename", productImagesController.getImage); // Новый роут для поддержки /api/images/имя_файла.png
+  // app.delete("/api/uploads/file/:filename", productImagesController.deleteImage);
+  // app.get("/api/uploads", productImagesController.getAllImages);
+  // app.post("/api/uploads/migrate-images", productImagesController.getImage);
 
   // API endpoint для получения изображений по ID (для блога)
-  app.get('/api/uploads/:id', async (req, res) => {
-    try {
-      const imageId = parseInt(req.params.id);
-
-      if (isNaN(imageId)) {
-        return res.status(400).json({ error: 'Invalid image ID' });
-      }
-
-      // Ищем изображение в базе данных по ID
-      const dbImage = await db.select().from(uploaded_images).where(eq(uploaded_images.id, imageId)).limit(1);
-
-      if (dbImage.length === 0) {
-        return res.status(404).json({ error: 'Image not found' });
-      }
-
-      // Используем новый imageService для получения файла
-      const image = await imageService.getImage(dbImage[0].filename);
-
-      if (!image) {
-        return res.status(404).json({ error: 'Image file not found' });
-      }
-
-      res.setHeader('Content-Type', image.mimeType);
-      res.setHeader('Cache-Control', 'public, max-age=86400'); // Кэш на 24 часа
-      res.setHeader('Content-Length', image.buffer.length);
-
-      // Отправляем изображение
-      res.send(image.buffer);
-    } catch (error) {
-      console.error('Error serving image by ID:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+  // app.get('/api/uploads/:id', async (req, res) => {
+  //   try {
+  //     const imageId = parseInt(req.params.id);
+  //
+  //     if (isNaN(imageId)) {
+  //       return res.status(400).json({ error: 'Invalid image ID' });
+  //     }
+  //
+  //     // Ищем изображение в базе данных по ID
+  //     const dbImage = await db.select().from(uploaded_images).where(eq(uploaded_images.id, imageId)).limit(1);
+  //
+  //     if (dbImage.length === 0) {
+  //       return res.status(404).json({ error: 'Image not found' });
+  //     }
+  //
+  //     // Используем новый imageService для получения файла
+  //     const image = await imageService.getImage(dbImage[0].filename);
+  //
+  //     if (!image) {
+  //       return res.status(404).json({ error: 'Image file not found' });
+  //     }
+  //
+  //     res.setHeader('Content-Type', image.mimeType);
+  //     res.setHeader('Cache-Control', 'public, max-age=86400'); // Кэш на 24 часа
+  //     res.setHeader('Content-Length', image.buffer.length);
+  //
+  //     // Отправляем изображение
+  //     res.send(image.buffer);
+  //   } catch (error) {
+  //     console.error('Error serving image by ID:', error);
+  //     res.status(500).json({ error: 'Internal server error' });
+  //   }
+  // });
 
   // Product-specific image routes - жесткая связь товар-изображение
-  app.get("/api/products/:productId/images", imageController.getProductImages);
-  app.get("/api/products/:productId/primary-image", imageController.getPrimaryProductImage);
+  app.get("/api/products/:productId/images", productImagesController.getProductImages);
+  app.get("/api/products/:productId/primary-image", productImagesController.getPrimaryProductImage);
 
   // // Authentication routes
   // app.post("/api/auth/telegram", authController.telegramAuth);
@@ -348,15 +309,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   //   }
   // });
   //
-  // Admin authentication routes with enhanced security
-  app.get("/api/admin/captcha", adminRateLimit, getCaptcha);
-  app.post("/api/admin/login", loginRateLimit, adminLogin);
-  app.post("/api/admin/logout", adminAuthMiddleware, adminLogout);
-  app.get("/api/admin/test", adminAuthMiddleware, adminSecurityEnforcement, enhancedAdminProtection, adminRateLimit, (req, res) => res.json({ test: "success" }));
-  app.get("/api/admin/profile", adminAuthMiddleware, adminSecurityEnforcement, enhancedAdminProtection, adminRateLimit, getAdminProfile);
-  app.post("/api/admin/change-password", adminAuthMiddleware, adminSecurityEnforcement, enhancedAdminProtection, adminRateLimit, xssProtection, changePassword);
-// changePassword
-  // Product routes with caching and rate limiting
+//   // Admin authentication routes with enhanced security
+//   app.get("/api/admin/captcha", adminRateLimit, getCaptcha);
+//   app.post("/api/admin/login", loginRateLimit, adminLogin);
+//   app.post("/api/admin/logout", adminAuthMiddleware, adminLogout);
+//   app.get("/api/admin/test", adminAuthMiddleware, adminSecurityEnforcement, enhancedAdminProtection, adminRateLimit, (req, res) => res.json({ test: "success" }));
+//   app.get("/api/admin/profile", adminAuthMiddleware, adminSecurityEnforcement, enhancedAdminProtection, adminRateLimit, getAdminProfile);
+//   app.post("/api/admin/change-password", adminAuthMiddleware, adminSecurityEnforcement, enhancedAdminProtection, adminRateLimit, xssProtection, changePassword);
+// // changePassword
+//   // Product routes with caching and rate limiting
   app.get("/api/products", createRateLimit(200, 60000), async (req, res, next) => {
     try {
       // Проверяем кэш
@@ -371,10 +332,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       errorMonitoringService.logError('error', 'Products cache middleware error', error as Error);
       next();
     }
-  }, productController.getProducts);
+  }, productsController.getProducts);
 
   // Random products endpoint for homepage
-  app.get("/api/products/random", createRateLimit(200, 60000), productController.getProductsByCategory());
+  app.get("/api/products/random", createRateLimit(200, 60000), productsController.getProductsByCategory());
 
   // 301 редиректы для старых цифровых URL
   app.get("/product/7", (req, res) => {
